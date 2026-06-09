@@ -3,280 +3,651 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>途虎通 · 竞对预警</title>
+<title>京东养车竞对预警</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f0f0;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:24px;}
-.device{width:390px;background:#efefef;border-radius:20px;overflow:hidden;border:1px solid #ccc;}
-.topbar{background:#c0392b;padding:12px 16px;display:flex;align-items:center;gap:10px;}
-.topbar-back{color:#fff;font-size:17px;cursor:pointer;line-height:1;}
-.topbar-title{color:#fff;font-size:15px;font-weight:500;flex:1;}
-.topbar-sub{color:rgba(255,255,255,0.8);font-size:11px;}
-.chat-area{padding:14px 12px;display:flex;flex-direction:column;gap:12px;background:#efefef;}
-.time-div{text-align:center;font-size:11px;color:#999;}
-.msg-row{display:flex;align-items:flex-start;gap:8px;}
-.av{width:34px;height:34px;border-radius:50%;background:#c0392b;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:500;}
-.bubble{background:#fff;border-radius:0 8px 8px 8px;padding:9px 11px;max-width:84%;font-size:13px;color:#333;line-height:1.65;}
-.warn-bubble{background:#fff;border-left:3px solid #e85d00;border-radius:0 8px 8px 8px;padding:9px 11px;max-width:84%;}
-.wtag{font-size:11px;font-weight:500;color:#854F0B;background:#FAEEDA;padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:5px;}
-.wbody{font-size:13px;color:#333;line-height:1.65;}
-.hl{color:#c0392b;font-weight:500;}
-.ws{margin-top:6px;padding:5px 8px;background:#fdf6ee;border-radius:4px;}
-.wr{font-size:12px;color:#555;padding:2px 0;display:flex;justify-content:space-between;}
-.wdist{color:#c0392b;font-weight:500;}
-.wlink{display:inline-flex;align-items:center;gap:4px;color:#e85d00;font-size:12px;margin-top:7px;border:0.5px solid #e85d00;padding:3px 10px;border-radius:12px;cursor:pointer;transition:background 0.15s;user-select:none;}
-.wlink:hover{background:#fff3ec;}
-.input-bar{background:#f5f5f5;padding:10px 12px;display:flex;align-items:center;gap:8px;border-top:1px solid #ddd;}
-.input-fake{flex:1;background:#fff;border-radius:16px;padding:7px 12px;font-size:13px;color:#bbb;border:0.5px solid #e0e0e0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f5f5f7;min-height:100vh;}
 
+/* ── 顶部导航 ── */
+.page-nav{background:#1a1a1a;padding:10px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;}
+.page-nav span{color:#666;}
+.page-nav a{color:#aaa;text-decoration:none;}
+.page-nav .cur{color:#fff;}
+
+/* ── Tab 栏 ── */
+.tab-bar{background:#fff;border-bottom:1px solid #e8e8e8;padding:0 24px;display:flex;gap:0;}
+.tab{padding:14px 20px;font-size:14px;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;user-select:none;}
+.tab:hover{color:#333;}
+.tab.active{color:#722ED1;border-bottom:2px solid #722ED1;font-weight:500;}
+
+/* ── 页面内容区 ── */
+.page-body{padding:24px;max-width:1200px;margin:0 auto;}
+
+/* ── Tab 内容 ── */
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* ══════════════════════════════
+   途虎通消息 Tab
+══════════════════════════════ */
+.msg-layout{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start;}
+
+/* 消息列表面板 */
+.msg-panel{background:#fff;border-radius:8px;border:1px solid #e8e8e8;overflow:hidden;}
+.msg-panel-hd{padding:14px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;font-weight:500;color:#1a1a1a;display:flex;align-items:center;gap:8px;}
+.msg-panel-hd .badge{background:#f53f3f;color:#fff;font-size:11px;padding:1px 6px;border-radius:10px;}
+.msg-list{padding:12px;}
+.msg-item{padding:10px 12px;border-radius:6px;margin-bottom:6px;cursor:pointer;border:1px solid transparent;transition:all 0.12s;}
+.msg-item:hover{background:#fafafa;border-color:#e8e8e8;}
+.msg-item.active{background:#f9f0ff;border-color:#d3adf7;}
+.msg-item.sys{background:#fafafa;}
+.msg-item-hd{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.msg-tag-warn{background:#fff3ec;color:#c04800;font-size:11px;padding:1px 6px;border-radius:4px;font-weight:500;}
+.msg-tag-sys{background:#f0f0f0;color:#666;font-size:11px;padding:1px 6px;border-radius:4px;}
+.msg-time{font-size:11px;color:#aaa;margin-left:auto;}
+.msg-text{font-size:12px;color:#555;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.msg-text .hl{color:#c0392b;font-weight:500;}
+.msg-dist{display:inline-block;margin-top:4px;font-size:11px;color:#e85d00;background:#fff3ec;padding:1px 6px;border-radius:4px;}
+.msg-map-link{display:inline-flex;align-items:center;gap:3px;margin-top:5px;margin-left:6px;font-size:11px;color:#722ED1;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+
+/* 地图面板 */
+.map-panel{background:#fff;border-radius:8px;border:1px solid #e8e8e8;overflow:hidden;}
+.map-panel-hd{padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;}
+.map-panel-title{font-size:14px;font-weight:500;color:#1a1a1a;flex:1;}
+.map-panel-sub{font-size:12px;color:#aaa;}
 .map-area{background:#f5f2eb;position:relative;overflow:hidden;height:520px;}
 .map-grid-h{position:absolute;height:1px;background:#e0d8c8;left:0;width:100%;}
 .map-grid-v{position:absolute;width:1px;background:#e0d8c8;top:0;height:100%;}
 .road-h{position:absolute;background:#fff;left:0;width:100%;}
 .road-v{position:absolute;background:#fff;top:0;height:100%;}
-
 .pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;z-index:10;}
 .pin-wrap{display:flex;flex-direction:column;align-items:center;}
-.pin-tuhu{width:22px;height:22px;background:#e02020;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
+.pin-tuhu{width:22px;height:22px;background:#e02020;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
 .pin-tuhu-inner{width:8px;height:8px;background:#fff;border-radius:50%;transform:rotate(45deg);}
-.pin-jd-old{width:22px;height:22px;background:#e85d00;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;display:flex;align-items:center;justify-content:center;opacity:0.55;}
-.pin-jd-new{width:26px;height:26px;background:#ff6a00;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;display:flex;align-items:center;justify-content:center;animation:pjd 1.4s ease-in-out infinite;}
-@keyframes pjd{0%,100%{box-shadow:0 0 0 0 rgba(255,106,0,0.5)}50%{box-shadow:0 0 0 8px rgba(255,106,0,0)}}
+.pin-jd-old{width:22px;height:22px;background:#e85d00;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;display:flex;align-items:center;justify-content:center;opacity:0.55;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.pin-jd-new{width:26px;height:26px;background:#ff6a00;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;display:flex;align-items:center;justify-content:center;animation:pjd 1.4s ease-in-out infinite;box-shadow:0 1px 6px rgba(255,106,0,0.4);}
+@keyframes pjd{0%,100%{box-shadow:0 0 0 0 rgba(255,106,0,0.45)}50%{box-shadow:0 0 0 9px rgba(255,106,0,0)}}
 .pin-inner{width:8px;height:8px;background:#fff;border-radius:50%;transform:rotate(45deg);}
-.pin-lbl{font-size:9px;background:rgba(255,255,255,0.92);padding:1px 4px;border-radius:3px;white-space:nowrap;margin-top:5px;color:#333;pointer-events:none;border:0.5px solid #e0e0e0;}
-.new-badge{background:#ff6a00;color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;margin-bottom:3px;white-space:nowrap;pointer-events:none;}
+.pin-lbl{font-size:10px;background:rgba(255,255,255,0.94);padding:2px 5px;border-radius:3px;white-space:nowrap;margin-top:5px;color:#333;pointer-events:none;border:0.5px solid #ddd;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+.new-badge{background:#ff6a00;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-bottom:3px;white-space:nowrap;pointer-events:none;}
 
-.warn-ring{position:absolute;border-radius:50%;background:rgba(220,50,50,0.1);border:1.5px dashed rgba(220,50,50,0.5);transform:translate(-50%,-50%);pointer-events:none;display:none;}
-.dist-badge{position:absolute;background:rgba(200,40,40,0.82);color:#fff;font-size:11px;padding:2px 7px;border-radius:10px;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;z-index:20;}
+.dist-badge{position:absolute;background:rgba(200,40,40,0.82);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;z-index:20;}
+.info-card{position:absolute;background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:12px 14px;width:200px;z-index:30;display:none;box-shadow:0 4px 16px rgba(0,0,0,0.1);}
+.ic-close{position:absolute;top:8px;right:10px;cursor:pointer;font-size:14px;color:#aaa;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:4px;}
+.ic-close:hover{background:#f5f5f5;}
+.ic-title{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:6px;padding-right:18px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.ic-tag{background:#fff3ec;color:#c04800;font-size:10px;padding:1px 5px;border-radius:4px;}
+.ic-row{font-size:12px;color:#666;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.ic-dist{font-size:13px;font-weight:500;color:#d32f2f;margin-top:7px;padding-top:7px;border-top:1px solid #f0f0f0;}
+.ic-nrow{font-size:12px;display:flex;justify-content:space-between;padding:2px 0;}
+.map-legend{position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,0.96);border:1px solid #e8e8e8;border-radius:8px;padding:8px 12px;font-size:12px;color:#555;z-index:25;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.leg-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.leg-row:last-child{margin-bottom:0;}
+.leg-dot{width:10px;height:10px;border-radius:50%;}
+.leg-ring{width:12px;height:12px;border-radius:50%;background:rgba(220,50,50,0.1);border:1.5px dashed rgba(220,50,50,0.55);}
+.map-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.55);color:#fff;font-size:12px;padding:5px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:26;}
+.map-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#bbb;gap:12px;}
+.map-empty i{font-size:48px;}
+.map-empty p{font-size:14px;}
 
-.info-card{position:absolute;background:#fff;border:0.5px solid #ddd;border-radius:10px;padding:10px 12px;width:178px;z-index:30;display:none;}
-.ic-close{position:absolute;top:7px;right:8px;cursor:pointer;font-size:12px;color:#999;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
-.ic-close:hover{background:#f0f0f0;}
-.ic-title{font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:5px;padding-right:16px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
-.ic-tag{background:#fff3ec;color:#c04800;font-size:9px;padding:1px 4px;border-radius:5px;}
-.ic-row{font-size:11px;color:#555;margin-bottom:2px;display:flex;align-items:center;gap:4px;}
-.ic-dist{font-size:12px;font-weight:500;color:#e02020;margin-top:6px;padding-top:5px;border-top:0.5px solid #eee;}
-.ic-nrow{font-size:11px;display:flex;justify-content:space-between;padding:2px 0;}
+/* ══════════════════════════════
+   老板双周报 Tab
+══════════════════════════════ */
+.report-hd{margin-bottom:20px;}
+.report-title{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
+.report-sub{font-size:13px;color:#888;}
+.report-sub .period{color:#722ED1;font-weight:500;}
 
-.map-legend{position:absolute;bottom:10px;left:10px;background:rgba(255,255,255,0.95);border:0.5px solid #ddd;border-radius:8px;padding:7px 10px;font-size:11px;color:#444;z-index:25;}
-.leg-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
-.leg-dot{width:9px;height:9px;border-radius:50%;}
-.leg-ring{width:11px;height:11px;border-radius:50%;background:rgba(220,50,50,0.12);border:1px dashed rgba(220,50,50,0.55);}
-.hint-bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.52);color:#fff;font-size:11px;padding:4px 12px;border-radius:16px;pointer-events:none;white-space:nowrap;z-index:26;}
-.fade-overlay{position:absolute;inset:0;background:#c0392b;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:50;}
-.fade-overlay.show{opacity:0.15;}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:#fff;border-radius:8px;border:1px solid #e8e8e8;padding:16px 20px;}
+.stat-label{font-size:13px;color:#888;margin-bottom:8px;}
+.stat-val{font-size:28px;font-weight:600;color:#1a1a1a;}
+.stat-val span{font-size:14px;font-weight:400;color:#888;margin-left:3px;}
+
+.sec-hd{font-size:14px;font-weight:500;color:#333;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;}
+
+.prov-block{margin-bottom:12px;background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;}
+.prov-hd{background:#fafafa;padding:10px 16px;font-size:14px;font-weight:500;color:#1a1a1a;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f0f0f0;transition:background 0.12s;}
+.prov-hd:hover{background:#f0f0f0;}
+.prov-total{font-size:12px;font-weight:400;color:#888;margin-left:auto;}
+.city-blk{padding:12px 16px;}
+.city-blk+.city-blk{border-top:1px solid #f5f5f5;}
+.city-lbl{font-size:13px;font-weight:500;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.city-num{background:#f0f0f0;color:#666;font-size:11px;padding:1px 7px;border-radius:10px;}
+
+.store-card{border:1px solid #f0f0f0;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fff;}
+.store-card:last-child{margin-bottom:0;}
+.store-name{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.jd-tag{background:#FAEEDA;color:#633806;font-size:11px;padding:1px 6px;border-radius:4px;}
+.store-meta{display:flex;gap:16px;margin-bottom:0;}
+.meta-item{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;}
+.meta-val{color:#333;}
+.dist-val{color:#c0392b;font-weight:500;}
+
+.tuhu-blk{margin-top:8px;padding:8px 10px;background:#fafafa;border-radius:6px;border:1px solid #f0f0f0;}
+.tuhu-blk-title{font-size:11px;color:#aaa;margin-bottom:6px;letter-spacing:0.02em;}
+.tuhu-row{font-size:12px;color:#333;padding:4px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:6px;}
+.tuhu-row:last-child{border-bottom:none;padding-bottom:0;}
+.tuhu-info{flex:1;}
+.tuhu-name{font-weight:500;margin-bottom:2px;}
+.tuhu-meta-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ft-new{background:#E6F1FB;color:#0C447C;font-size:10px;padding:1px 6px;border-radius:4px;}
+.ft-tiany{background:#EEEDFE;color:#3C3489;font-size:10px;padding:1px 6px;border-radius:4px;}
+.s-open{color:#27500A;background:#EAF3DE;font-size:10px;padding:1px 6px;border-radius:4px;}
+.s-soon{color:#633806;background:#FAEEDA;font-size:10px;padding:1px 6px;border-radius:4px;}
+.s-pause{color:#501313;background:#FCEBEB;font-size:10px;padding:1px 6px;border-radius:4px;}
+.s-close{color:#444;background:#F0F0F0;font-size:10px;padding:1px 6px;border-radius:4px;}
+.tuhu-date{font-size:11px;color:#aaa;}
+
+.warn-blk{border:1.5px solid #ffa39e;border-radius:8px;padding:16px;margin-top:4px;background:#fff2f0;}
+.warn-blk-hd{font-size:14px;font-weight:500;color:#820014;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.warn-table{width:100%;border-collapse:collapse;}
+.warn-table th{font-size:12px;color:#aaa;font-weight:400;padding:6px 8px;border-bottom:1px solid rgba(255,163,158,0.3);text-align:left;}
+.warn-table td{font-size:13px;padding:7px 8px;border-bottom:1px solid rgba(255,163,158,0.2);color:#333;}
+.warn-table tr:last-child td{border-bottom:none;}
+.warn-table .city-cell{font-weight:500;color:#820014;}
+.warn-table .cnt-cell{color:#cf1322;font-weight:600;text-align:right;}
+.warn-table .store-cell{color:#555;font-size:12px;}
+
+.footer-note{font-size:12px;color:#aaa;margin-top:20px;line-height:1.7;padding-top:16px;border-top:1px solid #f0f0f0;}
+
+/* ══════════════════════════════
+   老板推送 Tab
+══════════════════════════════ */
+.boss-layout{max-width:700px;margin:0 auto;}
+.boss-msg-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;margin-bottom:0;}
+.boss-msg-hd{background:#fafafa;padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;}
+.boss-msg-hd-title{font-size:13px;font-weight:500;color:#888;flex:1;}
+.boss-msg-hd-time{font-size:12px;color:#bbb;}
+.boss-msg-row{padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background 0.12s;border-bottom:1px solid #f5f5f5;}
+.boss-msg-row:hover{background:#fafafa;}
+.boss-msg-row:last-child{border-bottom:none;}
+.boss-msg-icon{width:36px;height:36px;border-radius:8px;background:#fff3ec;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.boss-msg-main{flex:1;}
+.boss-msg-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:3px;}
+.boss-msg-desc{font-size:12px;color:#888;}
+.boss-msg-nums{display:flex;gap:12px;margin-top:6px;}
+.boss-num-pill{font-size:12px;padding:2px 10px;border-radius:12px;font-weight:500;}
+.boss-num-pill.total{background:#f0eaff;color:#722ED1;}
+.boss-num-pill.danger{background:#fff2f0;color:#cf1322;}
+.boss-msg-arrow{color:#ccc;font-size:16px;}
+
+/* 第二层面板 */
+.layer2-panel{display:none;margin-top:12px;background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;}
+.layer2-panel.open{display:block;}
+.layer2-hd{padding:12px 16px;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#333;}
+.layer2-hd-sub{font-size:12px;color:#888;margin-left:auto;}
+.layer2-row{padding:11px 16px;display:flex;align-items:center;border-bottom:1px solid #f5f5f5;transition:background 0.1s;}
+.layer2-row:last-child{border-bottom:none;}
+.layer2-row:hover{background:#fafafa;}
+.layer2-city{font-size:13px;font-weight:500;color:#1a1a1a;flex:1;}
+.layer2-stores{font-size:12px;color:#888;flex:2;}
+.layer2-cnt{font-size:13px;font-weight:600;color:#cf1322;width:40px;text-align:right;}
+
+.layer2-map-btn:hover{background:#f9f0ff;}
+.layer2-footer{padding:12px 16px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;}
+.layer2-detail-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#722ED1;cursor:pointer;}
+.layer2-detail-btn:hover{text-decoration:underline;}
+
+/* 第三层地图面板 */
+.layer3-panel{display:none;margin-top:12px;background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;}
+.layer3-panel.open{display:block;}
+.layer3-hd{padding:12px 16px;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;}
+.layer3-back{font-size:13px;color:#722ED1;cursor:pointer;display:flex;align-items:center;gap:4px;}
+.layer3-back:hover{text-decoration:underline;}
+.layer3-title{font-size:13px;font-weight:500;color:#1a1a1a;flex:1;}
+.layer3-sub{font-size:12px;color:#aaa;}
+.layer3-body{display:grid;grid-template-columns:200px 1fr;height:440px;}
+.layer3-store-list{border-right:1px solid #f0f0f0;overflow-y:auto;}
+.layer3-store-item{padding:10px 14px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background 0.1s;}
+.layer3-store-item:hover{background:#fafafa;}
+.layer3-store-item.active{background:#f9f0ff;border-left:2px solid #722ED1;}
+.layer3-store-name{font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:3px;}
+.layer3-store-dist{font-size:11px;color:#e85d00;}
+.layer3-map{background:#f5f2eb;position:relative;overflow:hidden;flex:1;}
+
+
+/* ══ 中台消息重构 ══ */
+.report-wrap{max-width:960px;margin:0 auto;}
+.report-filter{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-label{font-size:13px;color:#888;white-space:nowrap;}
+.filter-week-list{display:flex;gap:8px;flex-wrap:wrap;flex:1;}
+.filter-week{padding:4px 14px;border-radius:20px;border:1px solid #e8e8e8;font-size:12px;color:#666;cursor:pointer;transition:all 0.12s;background:#fff;white-space:nowrap;}
+.filter-week:hover{border-color:#d3adf7;color:#722ED1;}
+.filter-week.active{background:#722ED1;color:#fff;border-color:#722ED1;}
+.report-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.summary-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:14px 18px;cursor:pointer;transition:all 0.15s;position:relative;}
+.summary-card:hover{border-color:#d3adf7;box-shadow:0 2px 8px rgba(114,46,209,0.08);}
+.summary-card.active{border-color:#722ED1;box-shadow:0 2px 12px rgba(114,46,209,0.12);}
+.summary-card-label{font-size:12px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.summary-card-val{font-size:26px;font-weight:600;color:#1a1a1a;}
+.summary-card-val span{font-size:13px;font-weight:400;color:#888;margin-left:3px;}
+.summary-card-val.danger{color:#cf1322;}
+.summary-detail{display:none;margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0;}
+.summary-detail.open{display:block;}
+.summary-detail-row{font-size:12px;color:#555;padding:2px 0;display:flex;justify-content:space-between;}
+.summary-detail-row .dn{color:#1a1a1a;font-weight:500;}
+.summary-card-arrow{position:absolute;top:14px;right:14px;font-size:12px;color:#ccc;transition:transform 0.2s;}
+.summary-card-arrow.open{transform:rotate(180deg);}
+
+/* 高竞争城市块 */
+.hcc-block{background:#fff2f0;border:1.5px solid #ffa39e;border-radius:8px;margin-bottom:12px;overflow:hidden;}
+.hcc-hd{padding:12px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;transition:background 0.1s;}
+.hcc-hd:hover{background:rgba(255,163,158,0.15);}
+.hcc-hd-title{font-size:14px;font-weight:500;color:#820014;flex:1;}
+.hcc-hd-cnt{font-size:13px;color:#cf1322;font-weight:600;margin-right:8px;}
+.hcc-arrow{font-size:13px;color:#cf1322;transition:transform 0.2s;}
+.hcc-arrow.open{transform:rotate(90deg);}
+.hcc-body{display:none;border-top:1px solid rgba(255,163,158,0.3);}
+.hcc-body.open{display:block;}
+.hcc-city-row{padding:10px 16px;border-bottom:1px solid rgba(255,163,158,0.15);}
+.hcc-city-row:last-child{border-bottom:none;}
+.hcc-city-name{font-size:13px;font-weight:500;color:#820014;margin-bottom:6px;}
+.hcc-zero{padding:12px 16px;font-size:13px;color:#aaa;font-style:italic;}
+
+/* 省份明细块 */
+.prov-sec-hd{font-size:14px;font-weight:500;color:#333;margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;}
+
+/* 门店卡片 */
+.store-card2{border:1px solid #f0f0f0;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fff;}
+.store-card2:last-child{margin-bottom:0;}
+.store-card2-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.store-card2-name{font-size:13px;font-weight:500;color:#1a1a1a;flex:1;}
+.jd-new-tag{background:#FAEEDA;color:#633806;font-size:10px;padding:1px 6px;border-radius:4px;}
+.map-jump-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#722ED1;border:1px solid #d3adf7;padding:2px 8px;border-radius:4px;cursor:pointer;transition:background 0.1s;white-space:nowrap;}
+.map-jump-btn:hover{background:#f9f0ff;}
+.store-card2-meta{display:flex;gap:14px;margin-bottom:6px;flex-wrap:wrap;}
+.store-card2-meta .mi{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;}
+.store-card2-meta .mv{color:#333;}
+.store-card2-meta .mdist{color:#c0392b;font-weight:500;}
+.tuhu-info-row{background:#fafafa;border-radius:5px;padding:7px 10px;font-size:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid #f0f0f0;}
+.tuhu-info-row .tname{font-weight:500;color:#1a1a1a;}
+.tuhu-info-row .tsep{color:#ddd;}
+
+
+/* ── 中台消息时间线重构 ── */
+.report-wrap{max-width:900px;margin:0 auto;}
+.rpt-filter-bar{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.rpt-filter-label{font-size:13px;color:#888;white-space:nowrap;}
+.rpt-date-input{border:1px solid #e8e8e8;border-radius:4px;padding:5px 10px;font-size:13px;color:#333;outline:none;cursor:pointer;}
+.rpt-date-input:focus{border-color:#722ED1;}
+.rpt-filter-sep{font-size:13px;color:#aaa;}
+.rpt-filter-clear{font-size:12px;color:#722ED1;cursor:pointer;padding:4px 10px;border:1px solid #d3adf7;border-radius:4px;}
+.rpt-filter-clear:hover{background:#f9f0ff;}
+.rpt-timeline{position:relative;padding-left:28px;}
+.rpt-tl-item{position:relative;margin-bottom:20px;}
+.rpt-tl-dot{position:absolute;left:-24px;top:16px;width:10px;height:10px;border-radius:50%;background:#722ED1;border:2px solid #fff;box-shadow:0 0 0 2px #722ED1;}
+.rpt-tl-line{position:absolute;left:-19px;top:26px;width:2px;bottom:-20px;background:#e8e8f0;}
+.rpt-tl-item:last-child .rpt-tl-line{display:none;}
+.rpt-tl-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;}
+.rpt-tl-hd{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap;transition:background 0.1s;}
+.rpt-tl-hd:hover{background:#fafafa;}
+.rpt-tl-hd-left{display:flex;flex-direction:column;gap:3px;min-width:160px;}
+.rpt-tl-date{font-size:13px;font-weight:500;color:#1a1a1a;}
+.rpt-tl-period{font-size:11px;color:#aaa;}
+.rpt-tl-pills{display:flex;gap:7px;flex-wrap:wrap;flex:1;}
+.rpt-pill{font-size:12px;padding:4px 12px;border-radius:20px;cursor:pointer;transition:all 0.12s;user-select:none;white-space:nowrap;}
+.rpt-pill strong{font-weight:600;}
+.rpt-pill.new{background:#fff7e6;color:#d46b08;border:1px solid #ffd591;}
+.rpt-pill.new:hover,.rpt-pill.new.active{background:#fa8c16;color:#fff;border-color:#fa8c16;}
+.rpt-pill.hcc{background:#fff2f0;color:#cf1322;border:1px solid #ffa39e;}
+.rpt-pill.hcc:hover,.rpt-pill.hcc.active{background:#f5222d;color:#fff;border-color:#f5222d;}
+.rpt-pill.prov{background:#f0eaff;color:#531dab;border:1px solid #d3adf7;}
+.rpt-pill.prov:hover,.rpt-pill.prov.active{background:#722ED1;color:#fff;border-color:#722ED1;}
+.rpt-tl-map-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#722ED1;border:1px solid #d3adf7;padding:4px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:background 0.1s;}
+.rpt-tl-map-btn:hover{background:#f9f0ff;}
+.rpt-tl-arrow{font-size:14px;color:#ccc;transition:transform 0.2s;margin-left:auto;flex-shrink:0;}
+.rpt-tl-arrow.open{transform:rotate(180deg);}
+.rpt-tl-body{border-top:1px solid #f0f0f0;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.rpt-section{background:#fafafa;border:1px solid #f0f0f0;border-radius:6px;padding:12px 14px;}
+.rpt-sec-title{font-size:13px;font-weight:500;color:#333;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.rpt-sec-title.danger{color:#820014;}
+.hcc-city-row{padding:8px 0;border-bottom:1px solid #f0f0f0;}
+.hcc-city-row:last-child{border-bottom:none;padding-bottom:0;}
+.hcc-city-name{font-size:12px;font-weight:500;color:#820014;margin-bottom:6px;}
+.prov-chip{display:inline-flex;align-items:center;gap:5px;background:#f0eaff;border:1px solid #d3adf7;border-radius:20px;padding:4px 12px;font-size:12px;color:#531dab;}
+.prov-chip em{font-style:normal;font-weight:600;color:#722ED1;}
+.rpt-tl-empty{text-align:center;padding:40px;color:#bbb;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.rpt-tl-empty p{font-size:14px;}
+/* 门店卡片沿用 */
+.store-card2{border:1px solid #f0f0f0;border-radius:6px;padding:9px 11px;margin-bottom:7px;background:#fff;}
+.store-card2:last-child{margin-bottom:0;}
+.store-card2-hd{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
+.store-card2-name{font-size:13px;font-weight:500;color:#1a1a1a;flex:1;}
+.jd-new-tag{background:#FAEEDA;color:#633806;font-size:10px;padding:1px 6px;border-radius:4px;}
+.map-jump-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#722ED1;border:1px solid #d3adf7;padding:2px 8px;border-radius:4px;cursor:pointer;transition:background 0.1s;white-space:nowrap;}
+.map-jump-btn:hover{background:#f9f0ff;}
+.store-card2-meta{display:flex;gap:14px;margin-bottom:6px;flex-wrap:wrap;}
+.store-card2-meta .mi{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;}
+.store-card2-meta .mv{color:#333;}
+.store-card2-meta .mdist{color:#c0392b;font-weight:500;}
+.tuhu-info-row{background:#f5f5f5;border-radius:5px;padding:6px 10px;font-size:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid #efefef;}
+.tuhu-info-row .tname{font-weight:500;color:#1a1a1a;}
+.tuhu-info-row .tsep{color:#ddd;}
+
 </style>
 </head>
 <body>
-<div class="device">
 
-  <div id="chatScreen">
-    <div class="topbar">
-      <span class="topbar-back"><i class="ti ti-arrow-left"></i></span>
-      <span class="topbar-title">途虎通</span>
-    </div>
-    <div class="chat-area">
-      <div class="time-div">今天 09:58</div>
-      <div class="msg-row">
-        <div class="av">系统</div>
-        <div class="bubble">
-          <span style="font-weight:500;display:block;margin-bottom:3px;">【系统消息】</span>
-          罗灏甄将门店基础信息报错-&gt;POI报错申请(编号:31345635)工单撤回至开始节点
-        </div>
-      </div>
-      <div class="time-div">今天 11:20</div>
-      <div class="msg-row">
-        <div class="av">系统</div>
-        <div class="warn-bubble">
-          <span class="wtag">竞对预警</span>
-          <div class="wbody">您好，<span class="hl">湖北·武汉</span> 检测到 <span class="hl">京东养车·古田广场店</span> 在以下途虎门店附近开业，请及时关注：</div>
-          <div class="ws">
-            <div class="wr"><span>途虎养车·古田路店</span><span class="wdist">约 87m</span></div>
-            <div class="wr"><span>途虎养车·解放大道店</span><span class="wdist">约 94m</span></div>
-          </div>
-          <div><span class="wlink" onclick="jumpToMap(1)"><i class="ti ti-map-pin" style="font-size:13px;"></i>查看地图定位</span></div>
-        </div>
-      </div>
-      <div class="time-div">今天 14:33</div>
-      <div class="msg-row">
-        <div class="av">系统</div>
-        <div class="warn-bubble">
-          <span class="wtag">竞对预警</span>
-          <div class="wbody">您好，<span class="hl">湖北·武汉</span> 检测到 <span class="hl">京东养车·汉阳大道店</span> 在以下途虎门店附近开业，请及时关注：</div>
-          <div class="ws">
-            <div class="wr"><span>途虎养车·解放大道店</span><span class="wdist">约 63m</span></div>
-          </div>
-          <div><span class="wlink" onclick="jumpToMap(2)"><i class="ti ti-map-pin" style="font-size:13px;"></i>查看地图定位</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="input-bar">
-      <i class="ti ti-plus" style="color:#999;font-size:20px;"></i>
-      <div class="input-fake">输入消息…</div>
-      <i class="ti ti-microphone" style="color:#999;font-size:20px;"></i>
-    </div>
-  </div>
-
-  <div id="mapScreen" style="display:none;">
-    <div class="topbar">
-      <span class="topbar-back" onclick="backToChat()"><i class="ti ti-arrow-left"></i></span>
-      <span class="topbar-title" id="mapTitle">竞对预警地图</span>
-      <span class="topbar-sub" id="mapSub"></span>
-    </div>
-    <div class="map-area" id="mapArea">
-      <div class="fade-overlay" id="fadeOverlay"></div>
-
-      <div class="map-grid-h" style="top:20%;"></div>
-      <div class="map-grid-h" style="top:40%;"></div>
-      <div class="map-grid-h" style="top:60%;"></div>
-      <div class="map-grid-h" style="top:80%;"></div>
-      <div class="map-grid-v" style="left:25%;"></div>
-      <div class="map-grid-v" style="left:50%;"></div>
-      <div class="map-grid-v" style="left:75%;"></div>
-
-      <div class="road-h" style="top:30%;height:6px;opacity:0.7;"></div>
-      <div class="road-h" style="top:55%;height:5px;opacity:0.6;"></div>
-      <div class="road-h" style="top:70%;height:4px;opacity:0.5;"></div>
-      <div class="road-v" style="left:38%;width:6px;opacity:0.7;"></div>
-      <div class="road-v" style="left:62%;width:5px;opacity:0.6;"></div>
-      <div class="road-v" style="left:20%;width:4px;opacity:0.5;"></div>
-
-      <svg id="lineSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8;"></svg>
-
-      <div id="ring1" class="warn-ring" style="left:44%;top:42%;width:84px;height:84px;"></div>
-      <div id="ring2" class="warn-ring" style="left:63%;top:57%;width:84px;height:84px;"></div>
-
-      <div class="pin" style="left:40%;top:36%;">
-        <div class="pin-wrap">
-          <div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div>
-          <div class="pin-lbl">途虎·古田路店</div>
-        </div>
-      </div>
-      <div class="pin" style="left:60%;top:52%;">
-        <div class="pin-wrap">
-          <div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div>
-          <div class="pin-lbl">途虎·解放大道店</div>
-        </div>
-      </div>
-      <div class="pin" style="left:22%;top:62%;">
-        <div class="pin-wrap">
-          <div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div>
-          <div class="pin-lbl">途虎·东西湖店</div>
-        </div>
-      </div>
-      <div class="pin" style="left:80%;top:24%;">
-        <div class="pin-wrap">
-          <div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div>
-          <div class="pin-lbl">途虎·金银湖店</div>
-        </div>
-      </div>
-
-      <div class="pin" style="left:30%;top:20%;">
-        <div class="pin-wrap">
-          <div class="pin-jd-old"><span style="transform:rotate(45deg);font-size:8px;color:#fff;font-weight:700;line-height:1;">JD</span></div>
-          <div class="pin-lbl" style="color:#8a4000;">京东·汉口北店</div>
-        </div>
-      </div>
-      <div class="pin" style="left:70%;top:18%;">
-        <div class="pin-wrap">
-          <div class="pin-jd-old"><span style="transform:rotate(45deg);font-size:8px;color:#fff;font-weight:700;line-height:1;">JD</span></div>
-          <div class="pin-lbl" style="color:#8a4000;">京东·金银湖店</div>
-        </div>
-      </div>
-      <div class="pin" style="left:85%;top:48%;">
-        <div class="pin-wrap">
-          <div class="pin-jd-old"><span style="transform:rotate(45deg);font-size:8px;color:#fff;font-weight:700;line-height:1;">JD</span></div>
-          <div class="pin-lbl" style="color:#8a4000;">京东·武昌店</div>
-        </div>
-      </div>
-
-      <div class="pin" style="left:44%;top:42%;z-index:15;" onclick="openCard(1)">
-        <div class="pin-wrap">
-          <div class="new-badge">新开业</div>
-          <div class="pin-jd-new"><div class="pin-inner"></div></div>
-          <div class="pin-lbl" style="color:#c04800;font-weight:500;background:rgba(255,106,0,0.1);">京东·古田广场店</div>
-        </div>
-      </div>
-      <div class="pin" style="left:63%;top:57%;z-index:15;" onclick="openCard(2)">
-        <div class="pin-wrap">
-          <div class="new-badge">新开业</div>
-          <div class="pin-jd-new"><div class="pin-inner"></div></div>
-          <div class="pin-lbl" style="color:#c04800;font-weight:500;background:rgba(255,106,0,0.1);">京东·汉阳大道店</div>
-        </div>
-      </div>
-
-      <div class="info-card" id="card1" style="left:46%;top:13%;">
-        <div class="ic-close" onclick="closeCard(1)">✕</div>
-        <div class="ic-title">京东养车·古田广场店<span class="ic-tag">新开业</span></div>
-        <div class="ic-row"><i class="ti ti-calendar" style="font-size:12px;"></i>2026-05-28 开业</div>
-        <div class="ic-row"><i class="ti ti-map-pin" style="font-size:12px;"></i>古田广场B区1楼</div>
-        <div class="ic-dist"><i class="ti ti-alert-triangle" style="font-size:12px;color:#e85d00;"></i> 最近途虎门店 <strong>87m</strong></div>
-        <div style="margin-top:5px;">
-          <div style="font-size:10px;color:#888;margin-bottom:2px;">100m内途虎门店</div>
-          <div class="ic-nrow"><span>途虎·古田路店</span><span style="color:#e02020;font-weight:500;">87m</span></div>
-        </div>
-      </div>
-
-      <div class="info-card" id="card2" style="left:37%;top:36%;">
-        <div class="ic-close" onclick="closeCard(2)">✕</div>
-        <div class="ic-title">京东养车·汉阳大道店<span class="ic-tag">新开业</span></div>
-        <div class="ic-row"><i class="ti ti-calendar" style="font-size:12px;"></i>2026-05-30 开业</div>
-        <div class="ic-row"><i class="ti ti-map-pin" style="font-size:12px;"></i>汉阳大道凯德广场</div>
-        <div class="ic-dist"><i class="ti ti-alert-triangle" style="font-size:12px;color:#e85d00;"></i> 最近途虎门店 <strong>63m</strong></div>
-        <div style="margin-top:5px;">
-          <div style="font-size:10px;color:#888;margin-bottom:2px;">100m内途虎门店</div>
-          <div class="ic-nrow"><span>途虎·解放大道店</span><span style="color:#e02020;font-weight:500;">63m</span></div>
-        </div>
-      </div>
-
-      <div class="map-legend">
-        <div style="font-weight:500;margin-bottom:5px;">图例</div>
-        <div class="leg-row"><div class="leg-dot" style="background:#e02020;"></div><span>途虎门店</span></div>
-        <div class="leg-row"><div class="leg-dot" style="background:#ff6a00;"></div><span>京东新开门店</span></div>
-        <div class="leg-row"><div class="leg-dot" style="background:#e85d00;opacity:0.5;"></div><span>京东存量门店</span></div>
-        <div class="leg-row"><div class="leg-ring"></div><span>100m预警圈</span></div>
-      </div>
-
-      <div class="hint-bar" id="hintBar">已定位，点击橙色图标查看详情</div>
-    </div>
-  </div>
-
+<div class="page-nav">
+  <a href="#">首页</a><span>/</span>
+  <a href="#">竞对监控</a><span>/</span>
+  <span class="cur">京东养车竞对预警</span>
 </div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('msg',this)">途虎通消息</div>
+  <div class="tab" onclick="switchTab('report',this)">中台消息</div>
+</div>
+
+<div class="page-body">
+
+  <!-- ══════ Tab 1：途虎通消息 ══════ -->
+  <div id="tab-msg" class="tab-pane active">
+    <div class="msg-layout">
+
+      <!-- 左侧消息列表 -->
+      <div class="msg-panel">
+        <div class="msg-panel-hd">
+          <i class="ti ti-bell" style="font-size:15px;color:#722ED1;"></i>
+          消息列表
+          <span class="badge">2</span>
+        </div>
+        <div class="msg-list">
+          <div class="msg-item sys">
+            <div class="msg-item-hd"><span class="msg-tag-sys">系统消息</span><span class="msg-time">09:58</span></div>
+            <div class="msg-text">罗灏甄将门店基础信息报错→POI报错申请(编号:31345635)工单撤回至开始节点</div>
+          </div>
+          <div class="msg-item active" onclick="showMap(1,this)">
+            <div class="msg-item-hd"><span class="msg-tag-warn">竞对预警</span><span class="msg-time">11:20</span></div>
+            <div class="msg-text">湖北·武汉 检测到 <span class="hl">京东养车·古田广场店</span> 在以下途虎门店100m内开业，请及时关注。</div>
+            <span class="msg-dist">距途虎养车·古田路店 87m</span>
+            <span class="msg-map-link" onclick="event.stopPropagation();showMap(1,this.closest('.msg-item'))"><i class="ti ti-map-pin" style="font-size:11px;"></i>点击跳转至竞对地图</span>
+          </div>
+          <div class="msg-item" onclick="showMap(2,this)">
+            <div class="msg-item-hd"><span class="msg-tag-warn">竞对预警</span><span class="msg-time">14:33</span></div>
+            <div class="msg-text">湖北·武汉 检测到 <span class="hl">京东养车·汉阳大道店</span> 在以下途虎门店100m内开业，请及时关注。</div>
+            <span class="msg-dist">距途虎养车·解放大道店 63m</span>
+            <span class="msg-map-link" onclick="event.stopPropagation();showMap(2,this.closest('.msg-item'))"><i class="ti ti-map-pin" style="font-size:11px;"></i>点击跳转至竞对地图</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧地图 -->
+      <div class="map-panel">
+        <div class="map-panel-hd">
+          <i class="ti ti-map-2" style="font-size:15px;color:#722ED1;"></i>
+          <span class="map-panel-title" id="mapPanelTitle">竞对地图</span>
+          <span class="map-panel-sub" id="mapPanelSub">点击左侧消息查看定位</span>
+        </div>
+        <div class="map-area" id="mapArea">
+          <!-- 底图 -->
+          <div class="map-grid-h" style="top:20%;"></div>
+          <div class="map-grid-h" style="top:40%;"></div>
+          <div class="map-grid-h" style="top:60%;"></div>
+          <div class="map-grid-h" style="top:80%;"></div>
+          <div class="map-grid-v" style="left:25%;"></div>
+          <div class="map-grid-v" style="left:50%;"></div>
+          <div class="map-grid-v" style="left:75%;"></div>
+          <div class="road-h" style="top:30%;height:7px;opacity:0.65;"></div>
+          <div class="road-h" style="top:55%;height:6px;opacity:0.6;"></div>
+          <div class="road-h" style="top:70%;height:4px;opacity:0.5;"></div>
+          <div class="road-v" style="left:38%;width:7px;opacity:0.65;"></div>
+          <div class="road-v" style="left:62%;width:6px;opacity:0.6;"></div>
+          <div class="road-v" style="left:20%;width:4px;opacity:0.5;"></div>
+
+          <svg id="lineSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8;"></svg>
+
+          <!-- 途虎门店 -->
+          <div class="pin" style="left:40%;top:36%;"><div class="pin-wrap"><div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div><div class="pin-lbl">途虎·古田路店</div></div></div>
+          <div class="pin" style="left:60%;top:52%;"><div class="pin-wrap"><div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div><div class="pin-lbl">途虎·解放大道店</div></div></div>
+          <div class="pin" style="left:22%;top:62%;"><div class="pin-wrap"><div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div><div class="pin-lbl">途虎·东西湖店</div></div></div>
+          <div class="pin" style="left:80%;top:24%;"><div class="pin-wrap"><div class="pin-tuhu"><div class="pin-tuhu-inner"></div></div><div class="pin-lbl">途虎·金银湖店</div></div></div>
+
+          <!-- 京东存量 -->
+          <div class="pin" style="left:30%;top:20%;"><div class="pin-wrap"><div class="pin-jd-old"><span style="transform:rotate(45deg);font-size:8px;color:#fff;font-weight:700;">JD</span></div><div class="pin-lbl" style="color:#8a4000;">京东·汉口北店</div></div></div>
+          <div class="pin" style="left:70%;top:18%;"><div class="pin-wrap"><div class="pin-jd-old"><span style="transform:rotate(45deg);font-size:8px;color:#fff;font-weight:700;">JD</span></div><div class="pin-lbl" style="color:#8a4000;">京东·金银湖店</div></div></div>
+          <div class="pin" style="left:85%;top:48%;"><div class="pin-wrap"><div class="pin-jd-old"><span style="transform:rotate(45deg);font-size:8px;color:#fff;font-weight:700;">JD</span></div><div class="pin-lbl" style="color:#8a4000;">京东·武昌店</div></div></div>
+
+          <!-- 京东新开 -->
+          <div class="pin" style="left:44%;top:42%;z-index:15;" onclick="openCard(1)"><div class="pin-wrap"><div class="new-badge">新开业</div><div class="pin-jd-new"><div class="pin-inner"></div></div><div class="pin-lbl" style="color:#c04800;font-weight:500;background:rgba(255,106,0,0.1);">京东·古田广场店</div></div></div>
+          <div class="pin" style="left:63%;top:57%;z-index:15;" onclick="openCard(2)"><div class="pin-wrap"><div class="new-badge">新开业</div><div class="pin-jd-new"><div class="pin-inner"></div></div><div class="pin-lbl" style="color:#c04800;font-weight:500;background:rgba(255,106,0,0.1);">京东·汉阳大道店</div></div></div>
+
+          <!-- 信息卡片 -->
+          <div class="info-card" id="card1" style="left:46%;top:10%;">
+            <div class="ic-close" onclick="closeCard(1)">✕</div>
+            <div class="ic-title">京东养车·古田广场店<span class="ic-tag">新开业</span></div>
+            <div class="ic-row"><i class="ti ti-calendar" style="font-size:13px;"></i>2026-05-28 开业</div>
+            <div class="ic-row"><i class="ti ti-map-pin" style="font-size:13px;"></i>古田广场B区1楼</div>
+            <div class="ic-dist"><i class="ti ti-alert-triangle" style="font-size:13px;color:#e85d00;"></i> 距途虎养车·古田路店 <strong>87m</strong></div>
+            <div style="margin-top:6px;"><div style="font-size:11px;color:#aaa;margin-bottom:3px;">100m内途虎门店</div><div class="ic-nrow"><span>途虎·古田路店</span><span style="color:#d32f2f;font-weight:500;">87m</span></div></div>
+          </div>
+          <div class="info-card" id="card2" style="left:36%;top:34%;">
+            <div class="ic-close" onclick="closeCard(2)">✕</div>
+            <div class="ic-title">京东养车·汉阳大道店<span class="ic-tag">新开业</span></div>
+            <div class="ic-row"><i class="ti ti-calendar" style="font-size:13px;"></i>2026-05-30 开业</div>
+            <div class="ic-row"><i class="ti ti-map-pin" style="font-size:13px;"></i>汉阳大道凯德广场</div>
+            <div class="ic-dist"><i class="ti ti-alert-triangle" style="font-size:13px;color:#e85d00;"></i> 距途虎养车·解放大道店 <strong>63m</strong></div>
+            <div style="margin-top:6px;"><div style="font-size:11px;color:#aaa;margin-bottom:3px;">100m内途虎门店</div><div class="ic-nrow"><span>途虎·解放大道店</span><span style="color:#d32f2f;font-weight:500;">63m</span></div></div>
+          </div>
+
+          <div class="map-legend">
+            <div style="font-weight:500;margin-bottom:6px;color:#333;">图例</div>
+            <div class="leg-row"><div class="leg-dot" style="background:#e02020;"></div><span>途虎门店</span></div>
+            <div class="leg-row"><div class="leg-dot" style="background:#ff6a00;"></div><span>京东新开门店</span></div>
+            <div class="leg-row"><div class="leg-dot" style="background:#e85d00;opacity:0.5;"></div><span>京东存量门店</span></div>
+          </div>
+          <div class="map-hint" id="mapHint">点击左侧预警消息自动定位</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- end tab-msg -->
+
+
+
+  <!-- ══════ Tab 2：老板双周报 ══════ -->
+  <div id="tab-report" class="tab-pane">
+    <div class="report-wrap">
+
+      <!-- 日期筛选栏 -->
+      <div class="rpt-filter-bar">
+        <i class="ti ti-calendar" style="font-size:14px;color:#722ED1;"></i>
+        <span class="rpt-filter-label">筛选时间段：</span>
+        <input type="date" id="dateFrom" value="2026-05-19" class="rpt-date-input" onchange="filterTimeline()">
+        <span class="rpt-filter-sep">至</span>
+        <input type="date" id="dateTo" value="2026-06-01" class="rpt-date-input" onchange="filterTimeline()">
+        <span class="rpt-filter-clear" onclick="clearDateFilter()">清除筛选</span>
+        <span style="margin-left:auto;font-size:12px;color:#aaa;" id="filterResult">共 2 条推送记录</span>
+      </div>
+
+      <!-- 时间线 -->
+      <div class="rpt-timeline" id="rptTimeline">
+
+        <!-- 推送记录1 -->
+        <div class="rpt-tl-item" data-date="2026-06-01">
+          <div class="rpt-tl-dot"></div>
+          <div class="rpt-tl-line"></div>
+          <div class="rpt-tl-card">
+            <div class="rpt-tl-hd" onclick="toggleTlCard(this)">
+              <div class="rpt-tl-hd-left">
+                <span class="rpt-tl-date">2026-06-01 推送</span>
+                <span class="rpt-tl-period">统计周期：2026-05-19 ~ 2026-06-01</span>
+              </div>
+              <div class="rpt-tl-pills">
+                <span class="rpt-pill new" onclick="event.stopPropagation();toggleTlSection(this,'new')">新增 <strong>11</strong> 家</span>
+                <span class="rpt-pill hcc" onclick="event.stopPropagation();toggleTlSection(this,'hcc')">高竞争城市 <strong>9</strong> 家</span>
+                <span class="rpt-pill prov" onclick="event.stopPropagation();toggleTlSection(this,'prov')">涉及 <strong>7</strong> 省份</span>
+                <span class="rpt-tl-map-btn" onclick="event.stopPropagation();switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>点击进入竞对地图</span>
+              </div>
+              <i class="ti ti-chevron-down rpt-tl-arrow"></i>
+            </div>
+
+            <!-- 展开内容 -->
+            <div class="rpt-tl-body" style="display:none;">
+
+              <!-- 高竞争城市 -->
+              <div class="rpt-section" id="sec-hcc-1" style="display:none;">
+                <div class="rpt-sec-title danger"><i class="ti ti-alert-triangle" style="font-size:13px;"></i>高竞争城市预警 · 共 9 家</div>
+                <div class="hcc-city-row"><div class="hcc-city-name">湖北省 · 武汉市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·古田广场店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0]);setTimeout(function(){showMap(1,document.querySelectorAll('.msg-item.warn')[0]);},100)"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-22 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·古田路店 87m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·古田路店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>李明强</span><span class="tsep">|</span><span>2021-03-15 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·汉阳大道店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0]);setTimeout(function(){showMap(2,document.querySelectorAll('.msg-item.warn')[1]);},100)"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-28 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·解放大道店 63m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·解放大道店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>王芳</span><span class="tsep">|</span><span>2022-06-01 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·武昌徐东店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-30 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·徐东店 95m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·徐东店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>陈伟</span><span class="tsep">|</span><span>2020-11-20 开业</span><span class="tsep">|</span><span class="s-pause">暂停营业</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">上海市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·浦东新区店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-20 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·张江店 72m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·张江店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>刘海涛</span><span class="tsep">|</span><span>2021-08-05 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">广东省 · 广州市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·广州天河店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-21 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·天河北店 88m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·天河北店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>周建明</span><span class="tsep">|</span><span>2022-04-18 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">广东省 · 深圳市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·深圳南山店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-25 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·科技园店 54m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·科技园店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>吴志远</span><span class="tsep">|</span><span>2023-03-22 开业</span><span class="tsep">|</span><span class="s-close">闭店中</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">广东省 · 东莞市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·东莞长安店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-26 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·长安镇店 79m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·长安镇店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>赵小龙</span><span class="tsep">|</span><span>2021-12-08 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">四川省 · 成都市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·成都锦江店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-23 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·春熙路店 91m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·春熙路店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>黄大伟</span><span class="tsep">|</span><span>2022-09-14 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">重庆市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·渝中区店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-27 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·解放碑店 68m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·解放碑店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>孙磊</span><span class="tsep">|</span><span>2020-07-30 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">江苏省 · 苏州市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·苏州工业园区店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-29 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·园区独墅湖店 83m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·园区独墅湖店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>钱晨</span><span class="tsep">|</span><span>2023-05-18 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+                <div class="hcc-city-row"><div class="hcc-city-name">湖南省 · 长沙市</div>
+                  <div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·长沙芙蓉店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-31 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·五一广场店 76m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·五一广场店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>林建国</span><span class="tsep">|</span><span>2021-05-20 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div>
+                </div>
+              </div>
+
+              <!-- 新增门店 -->
+              <div class="rpt-section" id="sec-new-1" style="display:none;">
+                <div class="rpt-sec-title"><i class="ti ti-building-store" style="font-size:13px;color:#e85d00;"></i>新增京东门店 · 共 11 家</div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>湖北省<span class="prov-total">武汉市 3家 · 荆门市 1家 · 共 4家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>武汉市<span class="city-num">3家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·古田广场店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0]);setTimeout(function(){showMap(1,document.querySelectorAll('.msg-item.warn')[0]);},100)"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-22</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·古田路店 87m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·古田路店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>李明强</span><span class="tsep">|</span><span>2021-03-15</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·汉阳大道店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0]);setTimeout(function(){showMap(2,document.querySelectorAll('.msg-item.warn')[1]);},100)"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-28</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·解放大道店 63m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·解放大道店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>王芳</span><span class="tsep">|</span><span>2022-06-01</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·武昌徐东店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-30</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·徐东店 95m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·徐东店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>陈伟</span><span class="tsep">|</span><span>2020-11-20</span><span class="tsep">|</span><span class="s-pause">暂停营业</span></div></div></div><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>荆门市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·荆门掇刀店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-24</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·荆门掇刀店 99m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·荆门掇刀店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>罗成</span><span class="tsep">|</span><span>2022-02-28</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>上海市<span class="prov-total">共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·浦东新区店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-20</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·张江店 72m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·张江店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>刘海涛</span><span class="tsep">|</span><span>2021-08-05</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>重庆市<span class="prov-total">共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·渝中区店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-27</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·解放碑店 68m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·解放碑店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>孙磊</span><span class="tsep">|</span><span>2020-07-30</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>广东省<span class="prov-total">广州·深圳·东莞 共 3家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>广州市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·广州天河店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-21</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·天河北店 88m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·天河北店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>周建明</span><span class="tsep">|</span><span>2022-04-18</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>深圳市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·深圳南山店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-25</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·科技园店 54m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·科技园店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>吴志远</span><span class="tsep">|</span><span>2023-03-22</span><span class="tsep">|</span><span class="s-close">闭店中</span></div></div></div><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>东莞市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·东莞长安店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-26</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·长安镇店 79m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·长安镇店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>赵小龙</span><span class="tsep">|</span><span>2021-12-08</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>四川省<span class="prov-total">成都市 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>成都市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·成都锦江店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-23</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·春熙路店 91m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·春熙路店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>黄大伟</span><span class="tsep">|</span><span>2022-09-14</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>江苏省<span class="prov-total">苏州市 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>苏州市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·苏州工业园区店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-29</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·园区独墅湖店 83m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·园区独墅湖店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>钱晨</span><span class="tsep">|</span><span>2023-05-18</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>湖南省<span class="prov-total">长沙市 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>长沙市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·长沙芙蓉店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-31</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·五一广场店 76m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·五一广场店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>林建国</span><span class="tsep">|</span><span>2021-05-20</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+              </div>
+
+              <!-- 涉及省份 -->
+              <div class="rpt-section" id="sec-prov-1" style="display:none;">
+                <div class="rpt-sec-title"><i class="ti ti-map-pin" style="font-size:13px;color:#722ED1;"></i>涉及省份 · 共 7 个</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;">
+                  <span class="prov-chip">湖北省 <em>4家</em></span>
+                  <span class="prov-chip">广东省 <em>3家</em></span>
+                  <span class="prov-chip">上海市 <em>1家</em></span>
+                  <span class="prov-chip">重庆市 <em>1家</em></span>
+                  <span class="prov-chip">四川省 <em>1家</em></span>
+                  <span class="prov-chip">江苏省 <em>1家</em></span>
+                  <span class="prov-chip">湖南省 <em>1家</em></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- 推送记录2（历史数据示例） -->
+        <div class="rpt-tl-item" data-date="2026-05-19">
+          <div class="rpt-tl-dot"></div>
+          <div class="rpt-tl-line"></div>
+          <div class="rpt-tl-card">
+            <div class="rpt-tl-hd" onclick="toggleTlCard(this)">
+              <div class="rpt-tl-hd-left">
+                <span class="rpt-tl-date">2026-05-19 推送</span>
+                <span class="rpt-tl-period">统计周期：2026-05-05 ~ 2026-05-18</span>
+              </div>
+              <div class="rpt-tl-pills">
+                <span class="rpt-pill new" onclick="event.stopPropagation();toggleTlSection(this,'new')">新增 <strong>6</strong> 家</span>
+                <span class="rpt-pill hcc" onclick="event.stopPropagation();toggleTlSection(this,'hcc')">高竞争城市 <strong>4</strong> 家</span>
+                <span class="rpt-pill prov" onclick="event.stopPropagation();toggleTlSection(this,'prov')">涉及 <strong>4</strong> 省份</span>
+                <span class="rpt-tl-map-btn" onclick="event.stopPropagation();switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>点击进入竞对地图</span>
+              </div>
+              <i class="ti ti-chevron-down rpt-tl-arrow"></i>
+            </div>
+            <div class="rpt-tl-body" style="display:none;">
+              <div class="rpt-section" id="sec-hcc-2" style="display:none;">
+                <div class="rpt-sec-title danger"><i class="ti ti-alert-triangle" style="font-size:13px;"></i>高竞争城市预警 · 共 4 家</div>
+                <div class="hcc-city-row"><div class="hcc-city-name">北京市</div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·朝阳店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-08 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·朝阳路店 76m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·朝阳路店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>赵峰</span><span class="tsep">|</span><span>2022-03-10 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div>
+                <div class="hcc-city-row"><div class="hcc-city-name">天津市</div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·河西店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-12 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·河西友谊路店 82m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·河西友谊路店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>刘洋</span><span class="tsep">|</span><span>2021-09-15 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div>
+                <div class="hcc-city-row"><div class="hcc-city-name">陕西省 · 西安市</div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·雁塔店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-14 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·小寨店 91m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·小寨店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>王建军</span><span class="tsep">|</span><span>2023-01-20 开业</span><span class="tsep">|</span><span class="s-soon">即将营业</span></div></div></div>
+                <div class="hcc-city-row"><div class="hcc-city-name">河南省 · 郑州市</div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·金水店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-16 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·金水路店 88m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·金水路店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>陈晓明</span><span class="tsep">|</span><span>2022-07-08 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div>
+              </div>
+              <div class="rpt-section" id="sec-new-2" style="display:none;">
+                <div class="rpt-sec-title"><i class="ti ti-building-store" style="font-size:13px;color:#e85d00;"></i>新增京东门店 · 共 6 家</div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>北京市<span class="prov-total">朝阳 1家 · 共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>朝阳区<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·朝阳店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-08 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·朝阳路店 76m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·朝阳路店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>赵峰</span><span class="tsep">|</span><span>2022-03-10 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>天津市<span class="prov-total">河西 1家 · 共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·河西店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-12 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·河西友谊路店 82m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·河西友谊路店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>刘洋</span><span class="tsep">|</span><span>2021-09-15 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>陕西省<span class="prov-total">西安市 1家 · 共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>西安市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·雁塔店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-14 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·小寨店 91m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·小寨店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>王建军</span><span class="tsep">|</span><span>2023-01-20 开业</span><span class="tsep">|</span><span class="s-soon">即将营业</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>河南省<span class="prov-total">郑州市 1家 · 共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>郑州市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·金水店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-16 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·金水路店 88m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·金水路店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>陈晓明</span><span class="tsep">|</span><span>2022-07-08 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>江苏省<span class="prov-total">南京市 1家 · 共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>南京市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·玄武店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-10 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·玄武湖店 79m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·玄武湖店</span><span class="tsep">|</span><span class="ft-new">新商</span><span>周磊</span><span class="tsep">|</span><span>2023-06-15 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+                <div class="prov-block"><div class="prov-hd" onclick="toggleProv(this)" style="cursor:pointer;"><i class="ti ti-map-pin" style="font-size:13px;color:#888;"></i>浙江省<span class="prov-total">杭州市 1家 · 共 1家</span><i class="ti ti-chevron-right" id="arrow" style="margin-left:8px;color:#bbb;font-size:12px;transition:transform 0.2s;flex-shrink:0;"></i></div><div class="prov-body" style="display:none;"><div class="city-blk"><div class="city-lbl"><i class="ti ti-building-community" style="font-size:12px;"></i>杭州市<span class="city-num">1家</span></div><div class="store-card2"><div class="store-card2-hd"><span class="store-card2-name">京东养车·西湖店</span><span class="jd-new-tag">新开业</span><span class="map-jump-btn" onclick="switchTab('msg',document.querySelectorAll('.tab')[0])"><i class="ti ti-map-pin" style="font-size:11px;"></i>竞对地图</span></div><div class="store-card2-meta"><div class="mi"><i class="ti ti-calendar" style="font-size:12px;"></i><span class="mv">2026-05-17 开业</span></div><div class="mi"><i class="ti ti-map" style="font-size:12px;"></i><span class="mdist">距途虎养车·西湖文化广场店 93m</span></div></div><div class="tuhu-info-row"><span class="tname">途虎养车·西湖文化广场店</span><span class="tsep">|</span><span class="ft-tiany">添翼</span><span>徐明</span><span class="tsep">|</span><span>2022-11-20 开业</span><span class="tsep">|</span><span class="s-open">正常经营</span></div></div></div></div></div>
+              </div>
+              <div class="rpt-section" id="sec-prov-2" style="display:none;">
+                <div class="rpt-sec-title"><i class="ti ti-map-pin" style="font-size:13px;color:#722ED1;"></i>涉及省份 · 共 4 个</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;">
+                  <span class="prov-chip">北京市 <em>1家</em></span>
+                  <span class="prov-chip">天津市 <em>1家</em></span>
+                  <span class="prov-chip">陕西省 <em>1家</em></span>
+                  <span class="prov-chip">河南省 <em>1家</em></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rpt-tl-empty" id="tlEmpty" style="display:none;">
+          <i class="ti ti-search" style="font-size:32px;color:#ddd;"></i>
+          <p>该时间段内暂无推送记录</p>
+        </div>
+
+      </div><!-- end timeline -->
+    </div>
+  </div><!-- end tab-report -->
+
+
+
+</div><!-- page-body -->
+
 <script>
 var stores={
   1:{jx:44,jy:42,tx:40,ty:36,dist:87,title:'京东养车·古田广场店'},
   2:{jx:63,jy:57,tx:60,ty:52,dist:63,title:'京东养车·汉阳大道店'}
 };
 
-function jumpToMap(id){
-  var ov=document.getElementById('fadeOverlay');
-  ov.classList.add('show');
-  setTimeout(function(){
-    document.getElementById('chatScreen').style.display='none';
-    document.getElementById('mapScreen').style.display='block';
-    ov.classList.remove('show');
-    var s=stores[id];
-    document.getElementById('mapTitle').textContent=s.title;
-    document.getElementById('mapSub').textContent='预警·距途虎'+s.dist+'m';
-    showRing(id);drawLine(id);openCard(id);
-    document.getElementById('hintBar').textContent='已定位：'+s.title+'·距最近途虎'+s.dist+'m';
-  },200);
+function toggleProv(hd){
+  var body=hd.nextElementSibling;
+  var arrow=hd.querySelector('[id="arrow"]');
+  var isOpen=body.style.display==='block';
+  body.style.display=isOpen?'none':'block';
+  if(arrow){arrow.style.transform=isOpen?'':'rotate(90deg)';}
+}
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.tab-pane').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
 }
 
-function backToChat(){
-  var ov=document.getElementById('fadeOverlay');
-  ov.classList.add('show');
-  setTimeout(function(){
-    document.getElementById('mapScreen').style.display='none';
-    document.getElementById('chatScreen').style.display='block';
-    ov.classList.remove('show');
-    hideRings();clearLines();closeCard(1);closeCard(2);
-  },200);
+function showMap(id,el){
+  // 先切换到途虎通消息tab
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab')[0].classList.add('active');
+  document.getElementById('tab-msg').classList.add('active');
+  document.querySelectorAll('.msg-item').forEach(function(m){m.classList.remove('active');});
+  el.classList.add('active');
+  var s=stores[id];
+  document.getElementById('mapPanelTitle').textContent=s.title;
+  document.getElementById('mapPanelSub').textContent='预警 · 距最近途虎门店 '+s.dist+'m';
+  drawLine(id);
+  openCard(id);
+  document.getElementById('mapHint').textContent='已定位：'+s.title+' · '+s.dist+'m';
 }
 
-function showRing(id){hideRings();document.getElementById('ring'+id).style.display='block';}
-function hideRings(){[1,2].forEach(function(i){document.getElementById('ring'+i).style.display='none';});}
 
 function drawLine(id){
   clearLines();
@@ -288,9 +659,9 @@ function drawLine(id){
   var line=document.createElementNS('http://www.w3.org/2000/svg','line');
   line.setAttribute('x1',x1);line.setAttribute('y1',y1);
   line.setAttribute('x2',x2);line.setAttribute('y2',y2);
-  line.setAttribute('stroke','rgba(200,40,40,0.65)');
+  line.setAttribute('stroke','rgba(200,40,40,0.6)');
   line.setAttribute('stroke-width','1.5');
-  line.setAttribute('stroke-dasharray','4 3');
+  line.setAttribute('stroke-dasharray','5 3');
   line.setAttribute('id','activeLine');
   svg.appendChild(line);
   var lbl=document.createElement('div');
@@ -300,19 +671,248 @@ function drawLine(id){
   lbl.textContent=s.dist+'m';
   area.appendChild(lbl);
 }
-
 function clearLines(){
   var l=document.getElementById('activeLine');if(l)l.remove();
   var d=document.getElementById('activeDist');if(d)d.remove();
 }
-
 function openCard(id){
   closeCard(1);closeCard(2);
   document.getElementById('card'+id).style.display='block';
-  showRing(id);drawLine(id);
+}
+function closeCard(id){document.getElementById('card'+id).style.display='none';}
+// ── 城市门店数据 ──
+var cityStores = {
+  '武汉': {
+    title:'湖北省 · 武汉市',sub:'3家新开门店',
+    tuhu:[1,2,3], jd:[1,2,3],
+    stores:[
+      {id:1,name:'京东养车·古田广场店',dist:'距途虎·古田路店 87m'},
+      {id:2,name:'京东养车·汉阳大道店',dist:'距途虎·解放大道店 63m'},
+      {id:3,name:'京东养车·武昌徐东店',dist:'距途虎·徐东店 95m'}
+    ]
+  },
+  '上海': {
+    title:'上海市',sub:'1家新开门店',
+    tuhu:[4], jd:[4],
+    stores:[{id:4,name:'京东养车·浦东新区店',dist:'距途虎·张江店 72m'}]
+  },
+  '广州': {
+    title:'广东省 · 广州市',sub:'1家新开门店',
+    tuhu:[5], jd:[5],
+    stores:[{id:5,name:'京东养车·广州天河店',dist:'距途虎·天河北店 88m'}]
+  },
+  '深圳':{title:'广东省 · 深圳市',sub:'1家新开门店',tuhu:[4],jd:[4],stores:[{id:4,name:'京东养车·深圳南山店',dist:'距途虎·科技园店 54m'}]},
+  '东莞':{title:'广东省 · 东莞市',sub:'1家新开门店',tuhu:[5],jd:[5],stores:[{id:5,name:'京东养车·东莞长安店',dist:'距途虎·长安镇店 79m'}]},
+  '成都':{title:'四川省 · 成都市',sub:'1家新开门店',tuhu:[4],jd:[4],stores:[{id:4,name:'京东养车·成都锦江店',dist:'距途虎·春熙路店 91m'}]},
+  '重庆':{title:'重庆市',sub:'1家新开门店',tuhu:[5],jd:[5],stores:[{id:5,name:'京东养车·渝中区店',dist:'距途虎·解放碑店 68m'}]},
+  '苏州':{title:'江苏省 · 苏州市',sub:'1家新开门店',tuhu:[4],jd:[4],stores:[{id:4,name:'京东养车·苏州工业园区店',dist:'距途虎·独墅湖店 83m'}]},
+  '长沙':{title:'湖南省 · 长沙市',sub:'1家新开门店',tuhu:[5],jd:[5],stores:[{id:5,name:'京东养车·长沙芙蓉店',dist:'距途虎·五一广场店 76m'}]}
+};
+
+function toggleLayer2(){
+  var panel=document.getElementById('layer2Panel');
+  var arrow=document.getElementById('layer2Arrow');
+  var isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  arrow.style.transform=isOpen?'':'rotate(180deg)';
+  if(isOpen){
+    document.getElementById('layer3Panel').classList.remove('open');
+  }
 }
 
-function closeCard(id){document.getElementById('card'+id).style.display='none';}
+function openLayer3(city, firstId){
+  var data=cityStores[city];
+  if(!data) return;
+  document.getElementById('layer3Panel').classList.add('open');
+  document.getElementById('layer3Title').textContent=data.title+' · 竞对地图';
+  document.getElementById('layer3Sub').textContent=data.sub;
+
+  // 渲染左侧门店列表
+  var list=document.getElementById('layer3StoreList');
+  list.innerHTML='';
+  data.stores.forEach(function(s,i){
+    var div=document.createElement('div');
+    div.className='layer3-store-item'+(i===0?' active':'');
+    div.innerHTML='<div class="layer3-store-name">'+s.name+'</div><div class="layer3-store-dist">'+s.dist+'</div>';
+    div.onclick=(function(sid,el){return function(){
+      document.querySelectorAll('.layer3-store-item').forEach(function(x){x.classList.remove('active');});
+      el.classList.add('active');
+      bossOpenCard(sid);
+    };})(s.id, div);
+    list.appendChild(div);
+  });
+
+  // 显示对应城市的途虎+京东图标
+  for(var i=1;i<=5;i++){
+    var tj=document.getElementById('bossJ'+i);
+    var tt=document.getElementById('bossT'+i);
+    if(tj) tj.style.display='none';
+    if(tt) tt.style.display='none';
+  }
+  data.tuhu.forEach(function(i){
+    var t=document.getElementById('bossT'+i);
+    if(t) t.style.display='block';
+  });
+  data.jd.forEach(function(i){
+    var j=document.getElementById('bossJ'+i);
+    if(j) j.style.display='block';
+  });
+
+  // 默认打开第一家名片
+  bossOpenCard(data.stores[0].id);
+  document.getElementById('bossMapHint').textContent='已定位：'+data.title;
+}
+
+function closeLayer3(){
+  document.getElementById('layer3Panel').classList.remove('open');
+  bossClearLines();
+  for(var i=1;i<=5;i++){
+    bossCloseCard(i);
+    var j=document.getElementById('bossJ'+i);
+    var t=document.getElementById('bossT'+i);
+    if(j) j.style.display='none';
+    if(t) t.style.display='none';
+  }
+}
+
+var bossLineData={
+  1:{jx:44,jy:42,tx:40,ty:36}, 2:{jx:63,jy:57,tx:60,ty:52},
+  3:{jx:72,jy:38,tx:70,ty:32}, 4:{jx:48,jy:44,tx:45,ty:40},
+  5:{jx:46,jy:42,tx:42,ty:38}
+};
+
+function bossOpenCard(id){
+  for(var i=1;i<=5;i++) bossCloseCard(i);
+  var card=document.getElementById('bossCard'+id);
+  if(card) card.style.display='block';
+  bossClearLines();
+  var d=bossLineData[id];
+  if(!d) return;
+  var area=document.getElementById('layer3Map');
+  var w=area.offsetWidth, h=area.offsetHeight;
+  var svg=document.getElementById('bossLineSvg');
+  var x1=d.jx/100*w,y1=d.jy/100*h,x2=d.tx/100*w,y2=d.ty/100*h;
+  var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+  line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+  line.setAttribute('stroke','rgba(200,40,40,0.6)');
+  line.setAttribute('stroke-width','1.5');
+  line.setAttribute('stroke-dasharray','5 3');
+  line.setAttribute('id','bossLine');
+  svg.appendChild(line);
+  var lbl=document.createElement('div');
+  lbl.className='dist-badge';lbl.id='bossDist';
+  lbl.style.left=((x1+x2)/2)+'px';
+  lbl.style.top=((y1+y2)/2)+'px';
+  lbl.textContent=document.getElementById('bossCard'+id).querySelector('.ic-dist strong').textContent;
+  area.appendChild(lbl);
+}
+function bossCloseCard(id){
+  var c=document.getElementById('bossCard'+id);
+  if(c) c.style.display='none';
+}
+function bossClearLines(){
+  var l=document.getElementById('bossLine');if(l)l.remove();
+  var d=document.getElementById('bossDist');if(d)d.remove();
+}
+
+
+function selectWeek(el, start, end) {
+  document.querySelectorAll('.filter-week').forEach(function(w){w.classList.remove('active');});
+  el.classList.add('active');
+  // 这里可根据日期切换数据，当前演示只切换选中态
+}
+
+function toggleSummary(card, key) {
+  var detail = document.getElementById('sumProvDetail');
+  var arrow = document.getElementById('sumProvArrow');
+  if(key==='jd'){detail=document.getElementById('sumJdDetail');arrow=document.getElementById('sumJdArrow');}
+  if(key==='hcc'){detail=document.getElementById('sumHccDetail');arrow=document.getElementById('sumHccArrow');}
+  var isOpen = detail.classList.contains('open');
+  // 关闭所有
+  ['sumProvDetail','sumJdDetail','sumHccDetail'].forEach(function(id){document.getElementById(id).classList.remove('open');});
+  ['sumProvArrow','sumJdArrow','sumHccArrow'].forEach(function(id){document.getElementById(id).classList.remove('open');});
+  document.querySelectorAll('.summary-card').forEach(function(c){c.classList.remove('active');});
+  if(!isOpen){
+    detail.classList.add('open');
+    arrow.classList.add('open');
+    card.classList.add('active');
+  }
+}
+
+function toggleHcc(hd) {
+  var body = hd.nextElementSibling;
+  var arrow = hd.querySelector('.hcc-arrow');
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+
+
+// ── 中台消息时间线交互 ──
+var tlData = [
+  {date:'2026-06-01',from:'2026-05-19',to:'2026-06-01'},
+  {date:'2026-05-19',from:'2026-05-05',to:'2026-05-18'}
+];
+
+function filterTimeline(){
+  var from = document.getElementById('dateFrom').value;
+  var to = document.getElementById('dateTo').value;
+  var items = document.querySelectorAll('.rpt-tl-item');
+  var visible = 0;
+  items.forEach(function(item){
+    var d = item.getAttribute('data-date');
+    var show = (!from || d >= from) && (!to || d <= to);
+    item.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+  document.getElementById('filterResult').textContent = '共 ' + visible + ' 条推送记录';
+  document.getElementById('tlEmpty').style.display = visible === 0 ? 'flex' : 'none';
+}
+
+function clearDateFilter(){
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  filterTimeline();
+}
+
+function toggleTlCard(hd){
+  var body = hd.nextElementSibling;
+  var arrow = hd.querySelector('.rpt-tl-arrow');
+  var isOpen = body.style.display === 'flex' || body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'flex';
+  if(arrow) arrow.classList.toggle('open', !isOpen);
+}
+
+function toggleTlSection(pill, type){
+  // 找最近的rpt-tl-body
+  var card = pill.closest('.rpt-tl-card');
+  var body = card.querySelector('.rpt-tl-body');
+  // 先展开body
+  if(body.style.display === 'none' || body.style.display === '') {
+    body.style.display = 'flex';
+    var arrow = card.querySelector('.rpt-tl-arrow');
+    if(arrow) arrow.classList.add('open');
+  }
+  // 找当前条目的index
+  var allItems = document.querySelectorAll('.rpt-tl-item');
+  var idx = -1;
+  allItems.forEach(function(item,i){if(item.contains(pill))idx=i+1;});
+  var secId = 'sec-' + type + '-' + idx;
+  var sec = document.getElementById(secId);
+  if(!sec) return;
+  // 关闭同card内其他section
+  body.querySelectorAll('.rpt-section').forEach(function(s){
+    if(s !== sec){ s.style.display='none'; }
+  });
+  // 切换当前section
+  var isOpen = sec.style.display === 'block';
+  sec.style.display = isOpen ? 'none' : 'block';
+  // pill激活态
+  card.querySelectorAll('.rpt-pill').forEach(function(p){p.classList.remove('active');});
+  if(!isOpen) pill.classList.add('active');
+}
+
 </script>
 </body>
 </html>
