@@ -266,8 +266,9 @@ function sw(t){['combined','offline'].forEach(p=>{const e=document.getElementByI
 function tog(btn,id){const b=document.getElementById(id);if(!b)return;const o=b.classList.toggle('show');btn.querySelector('span').textContent=o?'▼':'▶';btn.classList.toggle('op',o);}
 </script>
 
+
 <div class="panel" id="panel-offline">
-  <div style="max-width:860px;margin:0 auto;">
+  <div style="max-width:900px;margin:0 auto;">
 
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
       <div style="width:4px;height:24px;background:#6d4aad;border-radius:2px;flex-shrink:0;"></div>
@@ -278,164 +279,259 @@ function tog(btn,id){const b=document.getElementById(id);if(!b)return;const o=b.
       <div style="margin-left:auto;background:#f3eeff;border:1px solid #c4a8f8;border-radius:6px;padding:4px 14px;font-size:12px;color:#6d4aad;font-weight:500;">邮件审批</div>
     </div>
 
-    <div style="background:#fff;border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);">
+    <!-- 两栏布局：左审核链路，右邮件模板 -->
+    <div style="display:flex;gap:20px;align-items:flex-start;">
 
-      <!-- STEP 1 -->
-      <div style="background:#f3eeff;border-bottom:1.5px solid #ddd0f5;padding:14px 24px;display:flex;align-items:center;gap:12px;">
-        <div style="background:#6d4aad;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</div>
-        <div style="font-size:14px;font-weight:600;color:#4a2080;">高端店商资质及点址审批</div>
-        <div style="margin-left:auto;font-size:11px;color:#8b5cf6;">依次审批</div>
-      </div>
-      <div style="padding:20px 24px;">
-        <div style="padding-left:16px;">
+      <!-- ── 左：审核链路 ── -->
+      <div style="flex:1;min-width:0;">
 
-          <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-            <div style="display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;">
-              <div style="width:10px;height:10px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-              <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-            </div>
-            <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;flex:1;">
-              <div style="font-size:12px;font-weight:600;color:#6d4aad;margin-bottom:2px;">招商</div>
-              <div style="font-size:13px;color:var(--text);">完成申请字段信息填写</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-            <div style="display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;">
-              <div style="width:10px;height:10px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-              <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-            </div>
-            <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;flex:1;">
-              <div style="font-size:12px;font-weight:600;color:#6d4aad;margin-bottom:2px;">BDM</div>
-              <div style="font-size:13px;color:var(--text);">发起邮件审批流程</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-            <div style="display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;">
-              <div style="width:10px;height:10px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-              <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-            </div>
-            <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;flex:1;">
-              <div style="font-size:12px;font-weight:600;color:#6d4aad;margin-bottom:2px;">新/老商负责人</div>
-              <div style="font-size:13px;color:var(--text);">确认高端店申请意向</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-            <div style="display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;">
-              <div style="width:10px;height:10px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-              <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-            </div>
-            <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;flex:1;">
-              <div style="font-size:12px;font-weight:600;color:#6d4aad;margin-bottom:2px;">商管理</div>
-              <div style="font-size:13px;color:var(--text);">确认商资质</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-            <div style="display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;">
-              <div style="width:10px;height:10px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-              <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-            </div>
-            <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;flex:1;">
-              <div style="font-size:12px;font-weight:600;color:#6d4aad;margin-bottom:2px;">商圈</div>
-              <div style="font-size:13px;color:var(--text);">确认点址是否符合高端店要求</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:stretch;gap:0;">
-            <div style="display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;">
-              <div style="width:10px;height:10px;border-radius:50%;background:#6d4aad;border:2px solid #4a2080;margin-top:3px;flex-shrink:0;"></div>
-            </div>
-            <div style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:8px;padding:10px 14px;flex:1;">
-              <div style="font-size:12px;font-weight:600;color:#4a2080;margin-bottom:2px;">发管负责人</div>
-              <div style="font-size:13px;color:#4a2080;font-weight:600;">终审 ✓</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- divider -->
-      <div style="border-top:1.5px dashed #e0d8f0;margin:0 24px;"></div>
-
-      <!-- STEP 2 -->
-      <div style="padding:18px 24px;">
-        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div style="background:#6d4aad;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:#4a2080;margin-bottom:8px;">工程执行</div>
-            <div style="background:var(--tl);border:1px solid var(--tb);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-              <div style="background:var(--teal);color:#fff;border-radius:5px;padding:3px 10px;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;">@ 工程</div>
-              <div style="font-size:13px;color:var(--text);">商资质及点址审批通过后，依照<span style="font-weight:600;color:var(--teal);">高端店建店标准</span>执行</div>
+        <!-- CC 置顶 -->
+        <div style="margin-bottom:14px;">
+          <div class="eb" onclick="tog(this,'off_cc')"><span>▶</span> 邮件 CC 抄送人员</div>
+          <div class="ex" id="off_cc" style="max-width:100%;">
+            <div style="font-size:11px;font-weight:600;color:var(--ts);margin-bottom:8px;">邮件抄送（CC）</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">甘泉</span>
+          <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">工程（蔡航、梅洪斌）</span>
+              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">张卫杰（小鱼）</span>
+              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">顿秋平</span>
+              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">张浩31</span>
+              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">包思婕</span>
+                  <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">销运（老商：于雪 / 新商：陆小燕）</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- divider -->
-      <div style="border-top:1.5px dashed #e0d8f0;margin:0 24px;"></div>
+        <div style="background:#fff;border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);">
 
-      <!-- STEP 3 -->
-      <div style="padding:18px 24px;">
-        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div style="background:#6d4aad;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">3</div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:#4a2080;margin-bottom:12px;">合同审核（三方并行）</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-              <div style="background:#fdeef4;border:1.5px solid #f0a8c8;border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:13px;font-weight:600;color:#c84878;margin-bottom:6px;">@ 运管</div>
-                <div style="font-size:12px;color:#a06070;line-height:1.6;">审核租赁合同的</div>
-                <div style="background:#fff;border-radius:5px;padding:3px 8px;font-size:11px;font-weight:600;color:#c84878;border:1px solid #f0a8c8;margin-top:6px;display:inline-block;">三方协议</div>
-              </div>
-              <div style="background:#fdf5e0;border:1.5px solid #e8d080;border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:13px;font-weight:600;color:#b08830;margin-bottom:6px;">@ 法务</div>
-                <div style="font-size:12px;color:#8a6820;line-height:1.6;">审核加盟合同的</div>
-                <div style="background:#fff;border-radius:5px;padding:3px 8px;font-size:11px;font-weight:600;color:#b08830;border:1px solid #e8d080;margin-top:6px;display:inline-block;">补充协议</div>
-              </div>
-              <div style="background:#e8f4fe;border:1.5px solid #a0c8f0;border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:13px;font-weight:600;color:#2060a0;margin-bottom:6px;">@ 销运</div>
-                <div style="font-size:12px;color:#4a7898;line-height:1.6;">回收两份纸质合同</div>
-                <div style="background:#fff;border-radius:5px;padding:3px 6px;font-size:11px;font-weight:600;color:#2060a0;border:1px solid #a0c8f0;margin-top:6px;display:inline-block;">补充协议 + 三方协议</div>
-              </div>
-            </div>
+          <!-- STEP 1 -->
+          <div style="background:#f3eeff;border-bottom:1.5px solid #ddd0f5;padding:13px 20px;display:flex;align-items:center;gap:10px;">
+            <div style="background:#6d4aad;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
+            <div style="font-size:13px;font-weight:600;color:#4a2080;">高端店商资质及点址审批</div>
           </div>
-        </div>
-      </div>
-
-      <!-- divider -->
-      <div style="border-top:1.5px dashed #e0d8f0;margin:0 24px;"></div>
-
-      <!-- STEP 4 -->
-      <div style="padding:18px 24px 24px;">
-        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div style="background:#6d4aad;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">4</div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:#4a2080;margin-bottom:10px;">建店成功后 · 手动打标</div>
-            <div style="background:#fff8f0;border:1.5px solid #f0c888;border-radius:8px;padding:14px;margin-bottom:10px;">
-              <div style="font-size:12px;color:#a05010;font-weight:500;margin-bottom:10px;">销运监控，建店成功后手动触发以下操作</div>
-              <div style="display:flex;flex-wrap:wrap;gap:10px;">
-                <div style="background:#fff;border:1.5px solid #f0c888;border-radius:7px;padding:8px 16px;font-size:12px;color:#a05010;">
-                  <span style="font-weight:600;">@ 高端店运营</span> · 张信
+          <div style="padding:16px 20px;">
+            <div style="padding-left:12px;">
+              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
+                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
                 </div>
-                <div style="background:#fff;border:1.5px solid #f0c888;border-radius:7px;padding:8px 16px;font-size:12px;color:#a05010;">
-                  <span style="font-weight:600;">@ 工程</span> · 张卫杰（小鱼）
+                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
+                    <div>
+                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">招商</div>
+                      <div style="font-size:12px;color:var(--text);">完成申请字段信息填写</div>
+                    </div>
+                    
+                  </div>
                 </div>
               </div>
-              <div style="margin-top:10px;font-size:12px;color:#a05010;">由以上两人 <span style="font-weight:600;">手动打标高端店</span></div>
-            </div>
-            <div style="background:var(--tl);border:1px solid var(--tb);border-radius:8px;padding:9px 14px;font-size:12px;color:#0a6040;display:flex;align-items:center;gap:8px;">
-              <div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;"></div>
-              <span>线上化后此步骤将被系统自动打标取代，无需人工介入</span>
+              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
+                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
+                </div>
+                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
+                    <div>
+                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">BDM</div>
+                      <div style="font-size:12px;color:var(--text);">发起邮件审批流程</div>
+                    </div>
+                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">各自招商的 BDM</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
+                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
+                </div>
+                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
+                    <div>
+                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">新/老商负责人</div>
+                      <div style="font-size:12px;color:var(--text);">确认高端店申请</div>
+                    </div>
+                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">刘冬 / 谢甫勇</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
+                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
+                </div>
+                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
+                    <div>
+                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">商管理</div>
+                      <div style="font-size:12px;color:var(--text);">确认商资质</div>
+                    </div>
+                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">葛婷</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
+                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
+                </div>
+                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
+                    <div>
+                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">商圈</div>
+                      <div style="font-size:12px;color:var(--text);">确认点址是否符合高端店要求</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                      <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">侯丹 / 孙景妍 / 茆睿瑶</div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
+                  <div style="width:9px;height:9px;border-radius:50%;background:#6d4aad;border:2px solid #4a2080;margin-top:3px;flex-shrink:0;"></div>
+                  
+                </div>
+                <div style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:7px;padding:9px 12px;flex:1;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
+                    <div>
+                      <div style="font-size:11px;font-weight:600;color:#4a2080;margin-bottom:1px;">发管负责人</div>
+                      <div style="font-size:12px;color:var(--text);">终审 ✓</div>
+                    </div>
+                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">方露瑶</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <div style="border-top:1.5px dashed #e0d8f0;margin:0 20px;"></div>
+
+          <!-- STEP 2 -->
+          <div style="padding:14px 20px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="background:#6d4aad;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;color:#4a2080;margin-bottom:10px;">合同审核与归档（三方并行）</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div style="background:#fdeef4;border:1.5px solid #f0a8c8;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+                    <div style="font-size:12px;font-weight:600;color:#c84878;white-space:nowrap;">@ 李鸿芸</div>
+                    <div style="font-size:12px;color:#a06070;">审核并回收归档租赁合同的<span style="font-weight:600;color:#c84878;margin-left:4px;">三方协议</span></div>
+                  </div>
+                  <div style="background:#fdf5e0;border:1.5px solid #e8d080;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+                    <div style="font-size:12px;font-weight:600;color:#b08830;white-space:nowrap;">@ 李刚1</div>
+                    <div style="font-size:12px;color:#8a6820;">审核加盟合同的<span style="font-weight:600;color:#b08830;margin-left:4px;">补充协议</span></div>
+                  </div>
+                  <div style="background:#e8f4fe;border:1.5px solid #a0c8f0;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+                    <div style="font-size:12px;font-weight:600;color:#2060a0;white-space:nowrap;">@ 张信</div>
+                    <div style="font-size:12px;color:#4a7898;">统筹三方协议 &amp; 加盟补充协议的<span style="font-weight:600;color:#2060a0;margin-left:4px;">回收归档</span></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- ── 右：邮件模板 ── -->
+      <div style="flex:0 0 380px;min-width:0;">
+        <div style="background:#fff;border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);position:sticky;top:20px;">
+
+          <div style="background:#1a1714;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:13px;font-weight:600;color:#fff;">高端店新建店邮件模板</div>
+            <button onclick="copyEmail()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">复制</button>
+          </div>
+
+          <div id="email-template" style="padding:16px 18px;font-size:12px;line-height:1.8;color:var(--text);background:#fafafa;">
+            <div style="color:var(--ts);margin-bottom:8px;font-size:11px;">各位好：</div>
+            <div style="margin-bottom:8px;">现有加盟商<span style="background:#fff8e0;border-radius:3px;padding:0 3px;border:1px dashed #e8d080;cursor:pointer;" title="点击填写">X</span>计划于<span style="background:#fff8e0;border-radius:3px;padding:0 3px;border:1px dashed #e8d080;cursor:pointer;" title="点击填写">某地</span>新开途虎工场店，申请特批新建高端店</div>
+            <div style="font-weight:600;margin:10px 0 6px;">具体点址信息为：高端店新开门店</div>
+            <div style="background:#f5f4f1;border-radius:6px;padding:10px 12px;margin-bottom:10px;">
+              <div style="margin-bottom:4px;"><span style="color:#6d4aad;font-weight:600;">1)</span> 申请单号：<span style="color:var(--ts);">___________</span></div>
+              <div style="margin-bottom:4px;"><span style="color:#6d4aad;font-weight:600;">2)</span> 具体点址：<span style="color:var(--ts);">___________</span></div>
+              <div><span style="color:#6d4aad;font-weight:600;">3)</span> 场地信息（请尽可能多地提供相关信息）：</div>
+              <div style="color:var(--ts);font-size:11px;margin-top:4px;padding-left:14px;line-height:1.7;">
+                门店出入车辆动线图<br>门头招牌图<br>指引招牌图<br>指引招牌相对位置图（如有）<br>工位布局图
+              </div>
+            </div>
+            <div style="border-top:1px dashed var(--bdr);padding-top:10px;">
+              <div style="color:#6d4aad;font-weight:600;margin-bottom:6px;font-size:11px;">审批节点</div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@新/老商负责人</span> 确认高端店申请</div>
+                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@商管理</span> 确认商资质</div>
+                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@商圈</span> 确认点址是否符合高端店要求</div>
+                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@发管负责人</span> 终审</div>
+                <div style="font-size:11px;color:var(--text);"><span style="color:#c84878;font-weight:600;">@李鸿芸</span> 审核并回收归档租赁合同三方协议</div>
+                <div style="font-size:11px;color:var(--text);"><span style="color:#b08830;font-weight:600;">@李刚1</span> 审核加盟合同的补充协议</div>
+                <div style="font-size:11px;color:var(--text);"><span style="color:#2060a0;font-weight:600;">@张信</span> 统筹三方协议&amp;加盟补充协议的回收归档</div>
+              </div>
+            </div>
+            <div style="border-top:1px dashed var(--bdr);padding-top:10px;margin-top:8px;">
+              <div style="color:#6d4aad;font-weight:600;margin-bottom:6px;font-size:11px;">申请链路节点人</div>
+              <div style="font-size:11px;color:var(--ts);line-height:1.8;">
+                BDM：各自招商的BDM<br>
+                新老商负责人：刘冬/谢甫勇<br>
+                商管理：葛婷<br>
+                商圈：侯丹/孙景妍/茆睿瑶<br>
+                发管负责人：方露瑶
+              </div>
+            </div>
+            <div style="border-top:1px dashed var(--bdr);padding-top:10px;margin-top:8px;">
+              <div style="color:#6d4aad;font-weight:600;margin-bottom:6px;font-size:11px;">邮件CC</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                  <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">甘泉</span>
+                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">工程（蔡航、梅洪斌）</span>
+                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">张卫杰（小鱼）</span>
+                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">顿秋平</span>
+                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">张浩31</span>
+                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">包思婕</span>
+                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">销运（老商：于雪/新商：陆小燕）</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
     </div>
   </div>
 </div>
+
+<script>
+function copyEmail() {
+  const t = document.getElementById('email-template');
+  const lines = [];
+  lines.push('各位好：');
+  lines.push('');
+  lines.push('现有加盟商X计划于某地新开途虎工场店，申请特批新建高端店');
+  lines.push('');
+  lines.push('具体点址信息为：高端店新开门店');
+  lines.push('1) 申请单号：');
+  lines.push('2) 具体点址：');
+  lines.push('3) 场地信息（请尽可能多地提供相关信息）：门店出入车辆动线图、门头招牌图、指引招牌图、指引招牌相对位置图（如有）、工位布局图');
+  lines.push('');
+  lines.push('@新/老商负责人：确认高端店申请');
+  lines.push('@商管理 ：确认商资质');
+  lines.push('@商圈：确认点址是否符合高端店要求');
+  lines.push('@发管负责人：终审');
+  lines.push('@李鸿芸 审核并回收归档租赁合同三方协议、@李刚1 审核加盟合同的补充协议、@张信 统筹三方协议&加盟补充协议的回收归档');
+  lines.push('');
+  lines.push('申请链路节点人：BDM：各自招商的BDM；新老商负责人：刘冬/谢甫勇；商管理：葛婷；商圈：侯丹/孙景妍/茆睿瑶；发管负责人：方露瑶；');
+  lines.push('邮件CC：甘泉、工程（蔡航、梅洪斌）、张卫杰（小鱼）、顿秋平、张浩31、包思婕、销运（老商：于雪/新商：陆小燕）');
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const btn = document.querySelector('button[onclick="copyEmail()"]');
+    const orig = btn.textContent;
+    btn.textContent = '已复制 ✓';
+    btn.style.background = 'rgba(14,140,114,0.3)';
+    setTimeout(()=>{btn.textContent=orig;btn.style.background='rgba(255,255,255,0.12)';}, 2000);
+  });
+}
+</script>
 
 </body>
 </html>
