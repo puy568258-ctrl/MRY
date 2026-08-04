@@ -1,537 +1,1973 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>高端店建店审核链路 · 新/老商合并视图</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>门店迁址全流程</title>
 <style>
-:root{
-  --bg:#f5f4f1;--card:#fff;--bdr:#e5e0d8;--text:#1a1714;--ts:#7a7268;
-  --old:#e07a2f;--ol:#fef4e8;--ob:#f0c888;
-  --new:#4f63e8;--nl:#eef0fe;--nb:#b8c2f8;
-  --teal:#0e8c72;--tl:#e3f5f0;--tb:#7dd0bc;
-  --slate:#4a6080;--sl:#eef2f7;--sb:#b0bdd0;
-  --gy:#9a9088;--gyl:#f0ede8;--gyb:#d8d4cc;
-  --re:#c83030;--gr:#0e8c72;
-  --sh:0 2px 10px rgba(0,0,0,.06);--shhov:0 6px 20px rgba(0,0,0,.12);--r:10px;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  background: #f5f4f0; color: #2c2c2a;
+  padding: 36px 20px 80px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;color:var(--text);min-height:100vh;}
-header{background:#1a1714;color:#fff;padding:18px 36px;}
-header h1{font-size:17px;font-weight:600;}
-header p{font-size:12px;color:#888;margin-top:3px;}
-.tabs{display:flex;padding:20px 36px 0;border-bottom:2px solid var(--bdr);background:var(--bg);}
-.tab{padding:9px 22px;border-radius:8px 8px 0 0;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid transparent;border-bottom:none;color:var(--ts);background:var(--gyl);transition:all .18s;position:relative;bottom:-2px;}
-.tab:hover{background:#e8e4de;}
-.tab.ac{background:var(--tl);color:var(--teal);border-color:var(--tb);}
-.tab.ao2{background:#f3eeff;color:#6d4aad;border-color:#c4a8f8;}
-.panel{display:none;padding:32px 36px 60px;}.panel.show{display:block;}
-.flow{display:flex;flex-direction:column;align-items:center;}
-/* arrows */
-.arrw{width:2px;height:22px;background:var(--gy);margin:0 auto;position:relative;}
-.arrw::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--gy);border-bottom:none;}
-.arrw.g{background:var(--gr);}.arrw.g::after{border-top-color:var(--gr);}
-.arrw.r{background:var(--re);}.arrw.r::after{border-top-color:var(--re);}
-.arrw.b{background:var(--new);}.arrw.b::after{border-top-color:var(--new);}
-.arrw.o{background:var(--old);}.arrw.o::after{border-top-color:var(--old);}
-.arrw.t32{height:32px;}.arrw.t16{height:16px;}.arrw.t12{height:12px;}.arrw.t10{height:10px;}
-/* labels */
-.al{font-size:11px;color:var(--ts);text-align:center;margin:1px 0;line-height:1.4;}
-.al.g{color:var(--gr);}.al.r{color:var(--re);}
+.flow { max-width: 560px; margin: 0 auto; }
+h1 { font-size: 16px; font-weight: 500; margin-bottom: 28px; }
+
+/* groups */
+.group { border-radius: 10px; padding: 14px 14px 18px; margin-bottom: 0; }
+.group-new      { border: 1.5px dashed #9e98e0; background: #faf9ff; }
+.group-existing { border: 0.5px solid #c8c6bc;  background: #faf9f6; }
+.group-header { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.group-tag { font-size:10px; font-weight:500; padding:2px 8px; border-radius:4px; flex-shrink:0; }
+.tag-new      { background:#EEEDFE; color:#3C3489; border:0.5px solid #534AB7; }
+.tag-existing { background:#F1EFE8; color:#5F5E5A; border:0.5px solid #c8c6bc; }
+.group-title  { font-size:12px; font-weight:500; color:#444; }
+.new-hint     { font-size:10px; color:#7F77DD; margin-left:auto; }
+
 /* nodes */
-.node{position:relative;border-radius:var(--r);border:1.5px solid var(--gyb);background:var(--card);padding:11px 20px;min-width:190px;max-width:420px;text-align:center;box-shadow:var(--sh);transition:box-shadow .18s,transform .15s;}
-.node:hover{box-shadow:var(--shhov);transform:translateY(-1px);}
-.node .lb{font-size:14px;font-weight:500;color:var(--text);}
-.node .sb{font-size:11px;color:var(--ts);margin-top:3px;line-height:1.4;}
-.node.pill{border-radius:28px;min-width:150px;}
-.node.dash{border-style:dashed;}
-/* node color variants */
-.nd-old{border-color:var(--ob);background:var(--ol);}.nd-old .lb{color:var(--old);}
-.nd-new{border-color:var(--nb);background:var(--nl);}.nd-new .lb{color:var(--new);}
-.nd-teal{border-color:var(--tb);background:var(--tl);}.nd-teal .lb{color:var(--teal);}
-.nd-slate{border-color:var(--sb);background:var(--sl);}.nd-slate .lb{color:var(--slate);}
-.nd-gray{border-color:var(--gyb);background:var(--gyl);opacity:.8;}.nd-gray .lb{color:var(--gy);}
-/* expand button */
-.eb{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--ts);padding:5px 12px;background:var(--gyl);border-radius:6px;border:1px solid var(--bdr);cursor:pointer;user-select:none;width:fit-content;margin:3px auto;transition:all .15s;}
-.eb:hover,.eb.op{background:var(--tl);color:var(--teal);border-color:var(--tb);}
-.ex{display:none;border:1.5px solid var(--bdr);border-radius:var(--r);background:#f8f7f4;padding:12px;margin:4px 0;width:100%;max-width:480px;}
-.ex.show{display:block;}
-.sg{display:flex;gap:7px;}
-.sc{flex:1;border-radius:8px;padding:8px;text-align:center;border:1.5px solid;}
-.sc .sh{font-size:12px;font-weight:700;}.sc .ss{font-size:10px;margin-top:2px;}.sc .st{font-size:10px;margin-top:4px;padding:2px 6px;background:#fff;border-radius:4px;display:inline-block;}
-.arow{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.atxt{font-size:12px;}
-.sbadge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:var(--tl);color:var(--teal);border:1px solid var(--tb);margin-left:4px;}
-.ib{max-width:900px;margin:0 auto 20px;padding:10px 16px;border-radius:8px;font-size:12px;display:flex;gap:10px;align-items:flex-start;}
-/* hover show tips */
-.node:hover .tip-l,.node:hover .tip-r{display:block !important;}
+.node {
+  border-radius:7px; padding:9px 13px;
+  border:0.5px solid; display:flex; flex-direction:column;
+}
+.node.clickable { cursor:pointer; transition:opacity .12s; }
+.node.clickable:hover { opacity:.8; }
+.node-title { font-size:13px; font-weight:500; line-height:1.4; }
+.node-sub   { font-size:11px; margin-top:2px; opacity:.68; line-height:1.4; }
+
+.c-purple { background:#EEEDFE; border-color:#534AB7; color:#3C3489; }
+.c-gray   { background:#F1EFE8; border-color:#c8c6bc; color:#444441; }
+
+/* connectors */
+.conn { display:flex; flex-direction:column; align-items:center; height:18px; }
+.conn-sm { height:11px; }
+.conn-line  { width:1.5px; flex:1; background:#c8c6bc; }
+.conn-arrow { width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:7px solid #c8c6bc; }
+
+/* section connector */
+.sec-conn { display:flex; flex-direction:column; align-items:center; height:28px; }
+
+/* diamond */
+.diamond-wrap { display:flex; justify-content:center; margin:8px 0; }
+.diamond {
+  position:relative; width:200px; height:90px;
+  display:flex; align-items:center; justify-content:center;
+}
+.diamond::before {
+  content:''; position:absolute; inset:0;
+  background:#EEEDFE; border:1px solid #534AB7;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+.diamond-text {
+  position:relative; z-index:1;
+  font-size:12px; font-weight:500; color:#3C3489;
+  text-align:center; line-height:1.5;
+}
+
+/* three-way branch */
+.branch3 { display:flex; gap:8px; align-items:flex-start; }
+.branch3-col { flex:1; display:flex; flex-direction:column; min-width:0; }
+/* 路径A直通大箭头 */
+.branch-pass-arrow { flex:1; display:flex; flex-direction:column; align-items:center; min-height:110px; }
+.bpa-line { flex:1; width:2px; background:#8f88d8; }
+.bpa-head { width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-top:10px solid #8f88d8; }
+.branch3-label { font-size:10px; color:#999; text-align:center; margin-bottom:5px; line-height:1.3; }
+.bc { display:flex; justify-content:center; }
+.bc .conn-line { height:8px; }
+
+/* shared tail label */
+.tail-label {
+  font-size:10px; color:#7F77DD; text-align:center;
+  margin: 6px 0 0; font-style:italic;
+}
+.reject-label {
+  font-size:10px; color:#c0392b; text-align:center;
+  margin: 4px 0 0; font-style:italic;
+}
+.reject-arrow {
+  font-size:10px; color:#c0392b; text-align:center;
+  margin:6px 0 0; padding:4px 6px;
+  background:#FCEBEB; border:0.5px dashed #e3a8a8; border-radius:6px;
+  line-height:1.4;
+}
+/* 通过节点（绿色） */
+.c-green2 { background:#EAF6EF; border-color:#1d9e75; color:#11704f; }
+/* 三向分叉连接 */
+.fork3 { position:relative; height:24px; margin-top:2px; }
+.fork3-stem { position:absolute; left:50%; top:0; width:1.5px; height:10px; background:#c8c6bc; transform:translateX(-50%); }
+.fork3-bar { position:absolute; left:16.6%; right:16.6%; top:10px; height:1.5px; background:#c8c6bc; }
+.fork3-drops { position:absolute; left:0; right:0; top:10px; display:flex; }
+.fork3-drop { flex:1; display:flex; justify-content:center; }
+.fork3-drop::after { content:''; width:1.5px; height:14px; background:#c8c6bc; }
+
+/* expand node */
+.expand-node { cursor:pointer; }
+.expand-icon { font-size:10px; color:#534AB7; margin-top:4px; }
+.expand-content {
+  display:none; margin-top:8px; padding:10px 10px 6px;
+  border:0.5px dashed #c8c6bc; border-radius:7px; background:#f7f6f3;
+}
+.expand-content.open { display:block; }
+.expand-content .conn { height:11px; }
+.sub-node { border-radius:6px; padding:7px 11px; border:0.5px solid; font-size:12px; font-weight:500; }
+.sub-label { font-size:10px; color:#999; margin-bottom:6px; font-weight:500; }
+
+/* overlay */
+.overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.5); z-index:200;
+  align-items:center; justify-content:center;
+}
+.overlay.open { display:flex; }
+@keyframes pop { from{transform:scale(.9);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* app modal */
+.app-modal {
+  background:#f2f2f7; border-radius:14px;
+  width:300px; max-width:92vw; overflow:hidden;
+  animation:pop .16s ease;
+}
+.mock-sb { background:#fff; padding:8px 14px 4px; display:flex; justify-content:space-between; }
+.mock-sb .time { font-size:12px; font-weight:600; }
+.mock-sb .icons { font-size:11px; color:#333; }
+.mock-nav {
+  background:#fff; padding:6px 14px 10px;
+  display:flex; align-items:center; gap:8px;
+  border-bottom:0.5px solid #e5e5ea;
+}
+.mock-nav .back { font-size:16px; color:#1a56db; }
+.mock-nav .title { font-size:15px; font-weight:500; flex:1; text-align:center; }
+.mock-body { padding:10px 12px 14px; }
+.mock-st { font-size:11px; color:#8e8e93; margin:8px 0 6px 2px; }
+.app-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px 4px; background:#fff; border-radius:10px; padding:10px 8px; }
+.app-item { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.app-icon { width:42px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.app-name { font-size:9px; color:#333; text-align:center; line-height:1.2; }
+.app-item.hl .app-icon { background:#1a56db; box-shadow:0 2px 8px rgba(26,86,219,.3); }
+.app-item.hl .app-icon span { filter:brightness(10); }
+.app-item.hl .app-name { color:#1a56db; font-weight:500; }
+.app-close { display:block; width:calc(100% - 24px); margin:8px 12px 12px; padding:9px; background:#fff; border:none; border-radius:8px; font-size:13px; color:#1a56db; font-weight:500; cursor:pointer; }
+
+/* work modal */
+.work-modal {
+  background:#fff; border-radius:12px;
+  width:420px; max-width:94vw; max-height:88vh;
+  display:flex; flex-direction:column; overflow:hidden;
+  animation:pop .16s ease;
+}
+.wm-header { padding:14px 16px 12px; border-bottom:0.5px solid #eee; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.wm-title  { font-size:14px; font-weight:500; }
+.wm-close  { background:none; border:none; font-size:20px; color:#999; cursor:pointer; }
+.wm-body   { overflow-y:auto; padding:14px 16px; flex:1; }
+.wm-st     { font-size:11px; font-weight:500; color:#888; letter-spacing:.05em; text-transform:uppercase; margin-bottom:8px; }
+.wm-row    { display:flex; gap:10px; margin-bottom:8px; }
+.wm-field  { flex:1; }
+.wm-label  { font-size:10px; color:#aaa; margin-bottom:2px; }
+.wm-val    { font-size:12px; font-weight:500; }
+.wm-textarea { font-size:11px; color:#444; line-height:1.6; background:#f8f7f4; border-radius:6px; padding:8px 10px; border:0.5px solid #e5e3dc; width:100%; margin-bottom:8px; }
+.wm-table-wrap { overflow-x:auto; margin-bottom:10px; }
+.wm-table { width:100%; border-collapse:collapse; font-size:12px; }
+.wm-table th { background:#f5f4f0; padding:6px 10px; text-align:center; font-weight:500; color:#555; border:0.5px solid #e0ddd6; font-size:11px; }
+.wm-table td { padding:5px 10px; text-align:center; border:0.5px solid #e0ddd6; }
+.wm-table td:first-child { text-align:left; }
+.td-in { padding-left:18px !important; color:#555; }
+.td-chg { color:#c0392b; font-weight:500; }
+.tr-grp td { background:#f9f8f5; font-size:10px; color:#888; font-weight:500; }
+.wm-approvers { display:flex; align-items:center; gap:6px; background:#f8f7f4; border-radius:8px; padding:10px 12px; margin-bottom:6px; }
+.wm-approver { flex:1; text-align:center; }
+.wm-ar { font-size:12px; font-weight:500; margin-bottom:4px; }
+.wm-as { font-size:10px; padding:2px 8px; border-radius:10px; display:inline-block; background:#FFF9E6; color:#92660a; border:0.5px solid #e8c84a; }
+.wm-arrow-sep { color:#c8c6bc; font-size:16px; flex-shrink:0; }
+.wm-hint { font-size:10px; color:#888; line-height:1.5; margin-bottom:12px; }
+.wm-footer { padding:10px 16px 14px; border-top:0.5px solid #eee; display:flex; gap:8px; flex-shrink:0; }
+.wm-btn { flex:1; padding:9px; border-radius:7px; font-size:13px; font-weight:500; cursor:pointer; border:none; }
+.wm-ghost   { background:#f0ede6; color:#444; }
+.wm-primary { background:#534AB7; color:#fff; }
+
+/* 底线提示 */
+.baseline-hint {
+  font-size:10px; background:#FFF9E6; color:#92660a;
+  border:0.5px solid #e8c84a; border-radius:5px;
+  padding:5px 9px; margin-top:6px; line-height:1.6;
+}
+
+/* ── tabs ── */
+.tab-nav {
+  max-width: 1180px; margin: 0 auto 24px;
+  display: flex; gap: 4px;
+  border-bottom: 0.5px solid #d3d1c7;
+}
+.tab-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 10px 18px; font-size: 14px; color: #888;
+  font-family: inherit; position: relative; font-weight: 500;
+}
+.tab-btn:hover { color: #534AB7; }
+.tab-btn.active { color: #534AB7; }
+.tab-btn.active::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; background: #534AB7;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── tab2 three-end cards ── */
+.t2-head { max-width:1180px; margin:0 auto 20px; }
+.t2-sub { font-size:12px; color:#888; }
+.t2-cards {
+  max-width:760px; margin:0 auto;
+  display:grid; grid-template-columns:repeat(2,1fr); gap:16px;
+  align-items:start;
+}
+.t2-cards-3 {
+  max-width:1140px;
+  grid-template-columns:repeat(3,1fr);
+}
+.t2-card {
+  background:#fff; border:0.5px solid #e5e3dc; border-radius:12px;
+  padding:0 0 16px; overflow:hidden;
+}
+.t2-card-head { padding:16px 16px 14px; display:flex; align-items:center; gap:10px; }
+.t2-blue   { background:linear-gradient(180deg,#EBF2FF,#fff); }
+.t2-green  { background:linear-gradient(180deg,#E6FBF0,#fff); }
+.t2-purple { background:linear-gradient(180deg,#F2F0FF,#fff); }
+.t2-card-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.t2-icon-blue   { background:#1a56db; }
+.t2-icon-green  { background:#1d9e75; }
+.t2-icon-purple { background:#7b5ae0; }
+.t2-card-role { font-size:14px; font-weight:600; color:#2c2c2a; }
+.t2-card-sys  { font-size:11px; color:#888; margin-top:1px; }
+.t2-card-title { font-size:15px; font-weight:600; padding:0 16px; margin:4px 0 12px; }
+.t2-steps { list-style:none; counter-reset:s; padding:0 16px; margin:0; }
+.t2-steps li {
+  counter-increment:s; position:relative;
+  padding:0 0 14px 28px; font-size:11px; color:#666; line-height:1.6;
+}
+.t2-steps li::before {
+  content:counter(s); position:absolute; left:0; top:0;
+  width:18px; height:18px; border-radius:50%;
+  background:#f0ede6; color:#666; font-size:10px; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+}
+.t2-steps li b { display:block; color:#2c2c2a; font-size:12px; font-weight:600; margin-bottom:2px; }
+.t2-mock-label { font-size:11px; color:#aaa; padding:0 16px; margin:4px 0 8px; border-top:0.5px solid #f0ede6; padding-top:14px; }
+.t2-mock { margin:0 16px; background:#f8f8fa; border:0.5px solid #e8e6df; border-radius:10px; padding:12px; }
+.t2-mock-title { font-size:13px; font-weight:600; margin-bottom:10px; }
+.t2-mock-tabs { display:flex; gap:14px; margin-bottom:12px; border-bottom:0.5px solid #e5e3dc; padding-bottom:8px; }
+.t2-mt { font-size:11px; color:#999; }
+.t2-mt.active { color:#1a56db; font-weight:500; position:relative; }
+.t2-mock-item { background:#fff; border-radius:8px; padding:11px; }
+.t2-mi-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.t2-mi-no { font-size:10px; color:#999; }
+.t2-badge { font-size:10px; padding:2px 8px; border-radius:4px; }
+.t2-badge-warn { background:#FFF3CD; color:#92660a; }
+.t2-mi-store { font-size:13px; font-weight:600; margin-bottom:6px; }
+.t2-mi-tags { display:flex; gap:6px; margin-bottom:8px; }
+.t2-tag { font-size:10px; background:#f0ede6; color:#666; padding:2px 8px; border-radius:4px; }
+.t2-mi-line { display:flex; justify-content:space-between; font-size:11px; color:#888; padding:3px 0; border-top:0.5px solid #f4f2ec; }
+.t2-mock-tip { font-size:10px; color:#92660a; background:#FFF9E6; border:0.5px solid #f0e0a8; border-radius:6px; padding:7px 9px; margin-top:10px; line-height:1.5; }
+.t2-boss-bar { background:#1f2937; color:#fff; font-size:11px; padding:8px 10px; border-radius:6px 6px 0 0; margin:-12px -12px 0; }
+.t2-boss-tabs { display:flex; gap:8px; margin:12px 0 8px; }
+.t2-bt { font-size:10px; padding:3px 9px; border-radius:4px; background:#eee; color:#888; }
+.t2-bt.active { background:#dbeafe; color:#1a56db; font-weight:500; }
+.t2-boss-export { font-size:10px; color:#fff; background:#1a56db; display:inline-block; padding:4px 10px; border-radius:5px; margin-bottom:8px; }
+.t2-boss-table { width:100%; border-collapse:collapse; font-size:11px; }
+.t2-boss-table th { background:#f0ede6; padding:5px 7px; text-align:left; font-weight:500; color:#666; font-size:10px; }
+.t2-boss-table td { padding:5px 7px; border-bottom:0.5px solid #eee; color:#444; }
+.t2-st-warn { color:#92660a; background:#FFF3CD; padding:1px 6px; border-radius:3px; font-size:10px; }
+.t2-st-done { color:#1d7a4f; background:#d6f5e3; padding:1px 6px; border-radius:3px; font-size:10px; }
+.t2-st-wait { color:#999; background:#eee; padding:1px 6px; border-radius:3px; font-size:10px; }
+.t2-yx-no { font-size:10px; color:#999; margin-bottom:3px; }
+.t2-yx-store { font-size:13px; font-weight:600; margin-bottom:12px; }
+.t2-yx-label { font-size:11px; color:#888; margin-bottom:8px; }
+.t2-yx-node { display:flex; align-items:center; gap:8px; padding:6px 8px; background:#fff; border-radius:7px; margin-bottom:6px; }
+.t2-yx-node.dim { opacity:.55; }
+.t2-yx-dot { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; color:#fff; flex-shrink:0; }
+.t2-yx-dot.done { background:#1d9e75; }
+.t2-yx-dot.cur  { background:#1a56db; }
+.t2-yx-dot.wait { background:#c8c6bc; }
+.t2-yx-info { flex:1; }
+.t2-yx-role { font-size:12px; font-weight:500; }
+.t2-yx-time { font-size:10px; color:#aaa; }
+
+/* 中台端后台界面 mock */
+.t2-mock-admin { padding:0; overflow:hidden; }
+.adm-bar { background:#1f2937; color:#fff; font-size:10px; padding:8px 10px; }
+.adm-flow { display:flex; flex-wrap:wrap; gap:5px; padding:11px; background:#f8f8fa; }
+.adm-flow-step { position:relative; font-size:10px; color:#fff; background:#1a56db; padding:4px 9px; border-radius:4px; white-space:nowrap; }
+.adm-flow-step i { position:absolute; top:-6px; right:-6px; background:#e0322c; color:#fff; font-size:8px; font-style:normal; padding:0 4px; border-radius:8px; line-height:1.5; }
+.adm-table { width:100%; border-collapse:collapse; font-size:11px; }
+.adm-table th { background:#f0ede6; padding:6px 8px; text-align:left; font-weight:500; color:#666; font-size:10px; }
+.adm-table td { padding:6px 8px; border-bottom:0.5px solid #eee; color:#444; }
+
+/* ── tab3 interaction grid ── */
+.t3-grid {
+  max-width:1180px; margin:0 auto;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;
+}
+.t3-card {
+  background:#fff; border:0.5px solid #e5e3dc; border-radius:12px;
+  padding:20px; cursor:pointer; transition:transform .12s, box-shadow .12s;
+}
+.t3-card:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,.06); border-color:#534AB7; }
+.t3-icon { font-size:28px; margin-bottom:12px; }
+.t3-card-title { font-size:14px; font-weight:600; margin-bottom:6px; }
+.t3-card-desc { font-size:11px; color:#888; line-height:1.5; margin-bottom:12px; }
+.t3-card-cta { font-size:12px; color:#534AB7; font-weight:500; }
+
+@media (max-width:760px) {
+  .t2-cards { grid-template-columns:1fr; }
+  .t2-cards-3 { grid-template-columns:1fr; }
+}
+
+/* ── tab3 phone wizard ── */
+.phone {
+  width:340px; margin:0 auto;
+  background:#1a1a1a; border-radius:38px; padding:10px;
+  box-shadow:0 12px 40px rgba(0,0,0,.18);
+  position:relative;
+}
+.phone-notch {
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  width:110px; height:22px; background:#1a1a1a; border-radius:0 0 14px 14px; z-index:5;
+}
+.phone-screen {
+  background:#f2f2f7; border-radius:30px; overflow:hidden;
+  height:620px; display:flex; flex-direction:column;
+}
+.ph-status { background:#fff; padding:9px 18px 5px; display:flex; justify-content:space-between; font-size:11px; font-weight:600; }
+.ph-nav { background:#fff; padding:4px 14px 10px; display:flex; align-items:center; justify-content:space-between; border-bottom:0.5px solid #e8e8ed; }
+.ph-back { font-size:20px; color:#1a56db; cursor:pointer; width:16px; }
+.ph-title { font-size:15px; font-weight:600; }
+.ph-progress { height:3px; background:#e8e8ed; }
+.ph-progress-bar { height:100%; width:0%; background:#534AB7; transition:width .3s ease; }
+.ph-body { flex:1; overflow-y:auto; padding:16px 14px; }
+.ph-step { display:none; animation:phin .25s ease; }
+.ph-step.active { display:block; }
+@keyframes phin { from{opacity:0;transform:translateX(8px)} to{opacity:1;transform:translateX(0)} }
+
+.ph-section-label { font-size:12px; color:#8e8e93; margin-bottom:10px; }
+.ph-appgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 8px; background:#fff; border-radius:12px; padding:14px 10px; }
+.ph-app { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.ph-app span { font-size:10px; color:#444; text-align:center; }
+.ph-app-ic { width:46px; height:46px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.ph-app-hl { cursor:pointer; }
+.ph-app-hl .ph-app-ic { background:#1a56db; box-shadow:0 3px 10px rgba(26,86,219,.35); animation:pulse 1.6s infinite; }
+.ph-app-hl .ph-app-ic { color:#fff; }
+.ph-app-hl span { color:#1a56db; font-weight:600; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+.ph-card { background:#fff; border-radius:12px; padding:16px; }
+.ph-card-title { font-size:15px; font-weight:600; margin-bottom:10px; }
+.ph-p { font-size:12px; color:#666; line-height:1.7; margin-bottom:8px; }
+.ph-muted { color:#999; }
+.ph-ul { margin:0 0 4px; padding-left:18px; }
+.ph-ul li { font-size:12px; color:#444; line-height:1.9; }
+.ph-check { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; margin-top:14px; padding:12px; background:#fff; border-radius:10px; cursor:pointer; }
+.ph-check input { width:16px; height:16px; accent-color:#534AB7; }
+
+.ph-info-card, .ph-submit-card { background:#fff; border-radius:12px; padding:6px 14px; }
+.ph-kv { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:0.5px solid #f0f0f3; font-size:13px; color:#666; }
+.ph-kv:last-child { border-bottom:none; }
+.ph-kv b { color:#1a1a1a; font-weight:600; }
+.ph-kv-sub { padding-left:12px; color:#999; font-size:12px; }
+.ph-kv-sub b { color:#444; }
+
+.ph-hint-box { font-size:11px; text-align:center; color:#92660a; background:#FFF9E6; border-radius:8px; padding:10px; margin-top:14px; }
+.ph-hint-info { color:#1a56db; background:#EBF2FF; }
+
+.ph-form { display:flex; flex-direction:column; gap:12px; }
+.ph-field { display:flex; flex-direction:column; gap:5px; flex:1; }
+.ph-field label { font-size:11px; color:#888; }
+.ph-field-row { display:flex; gap:10px; }
+.ph-input { background:#fff; border-radius:9px; padding:11px 12px; font-size:13px; color:#999; border:0.5px solid #e5e5ea; }
+.ph-input-map { color:#1a56db; cursor:pointer; }
+.ph-real-input { background:#fff; border-radius:9px; padding:11px 12px; font-size:13px; border:0.5px solid #e5e5ea; width:100%; font-family:inherit; color:#1a1a1a; }
+.ph-real-input:focus { outline:none; border-color:#534AB7; }
+
+.ph-result-icon { font-size:48px; text-align:center; margin:20px 0 10px; }
+.ph-result-title { font-size:17px; font-weight:600; text-align:center; margin-bottom:18px; }
+.ph-check-list { background:#fff; border-radius:12px; padding:6px 14px; margin-bottom:14px; }
+.ph-cl-item { display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:0.5px solid #f0f0f3; font-size:12px; color:#444; }
+.ph-cl-item:last-child { border-bottom:none; }
+.ph-cl-ok { color:#1d9e75; font-weight:700; }
+.ph-warn-box { font-size:11px; color:#92660a; background:#FFF9E6; border:0.5px solid #f0e0a8; border-radius:10px; padding:12px; line-height:1.6; }
+.ph-warn-box b { color:#7a5208; }
+
+.ph-timeline { background:#fff; border-radius:12px; padding:14px; margin-bottom:14px; }
+.ph-tl-item { display:flex; align-items:center; gap:10px; font-size:12px; color:#bbb; padding:5px 0; position:relative; }
+.ph-tl-dot { width:18px; height:18px; border-radius:50%; background:#e5e5ea; color:#fff; font-size:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ph-tl-item.done { color:#1a1a1a; }
+.ph-tl-item.done .ph-tl-dot { background:#1d9e75; }
+.ph-tl-item.cur { color:#1a56db; font-weight:600; }
+.ph-tl-item.cur .ph-tl-dot { background:#1a56db; }
+
+.ph-footer { padding:12px 14px; background:#fff; border-top:0.5px solid #e8e8ed; display:flex; gap:10px; }
+.ph-btn-ghost { flex:1; padding:12px; border-radius:10px; border:0.5px solid #d3d1c7; background:#f5f4f0; color:#444; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
+.ph-btn-main { flex:2; padding:12px; border-radius:10px; border:none; background:#534AB7; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
+.ph-btn-main:disabled { background:#c8c6bc; cursor:not-allowed; }
+
+.t3-reset { text-align:center; margin-top:20px; }
+.t3-reset button { background:none; border:0.5px solid #d3d1c7; color:#888; padding:8px 18px; border-radius:20px; font-size:12px; cursor:pointer; font-family:inherit; }
+.t3-reset button:hover { color:#534AB7; border-color:#534AB7; }
+
+/* ── 合同上传步骤 ── */
+.ph-upload-tabs { display:flex; gap:2px; margin-bottom:14px; overflow-x:auto; }
+.ph-ut { font-size:10px; color:#bbb; white-space:nowrap; padding:4px 6px; position:relative; flex-shrink:0; }
+.ph-ut.done { color:#1d9e75; }
+.ph-ut.done::after { content:'✓'; font-size:8px; margin-left:2px; }
+.ph-ut.active { color:#1a56db; font-weight:600; }
+.ph-upload-block { background:#fff; border-radius:12px; padding:13px; margin-bottom:10px; }
+.ph-upload-title { font-size:12px; color:#444; font-weight:500; margin-bottom:10px; line-height:1.4; }
+.ph-upload-row { display:flex; gap:10px; }
+.ph-upload-thumb {
+  width:72px; height:72px; border-radius:8px; background:#f2f2f7;
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  border:0.5px solid #e5e5ea; flex-shrink:0;
+}
+.ph-upload-add {
+  width:72px; height:72px; border-radius:8px;
+  border:1px dashed #c8c6bc; color:#999; font-size:10px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; cursor:pointer; text-align:center; line-height:1.3;
+}
+.ph-upload-add:hover { border-color:#534AB7; color:#534AB7; }
+
+/* ── 场地信息步骤 ── */
+.ph-venue-tabs { display:flex; gap:18px; margin-bottom:12px; border-bottom:0.5px solid #e8e8ed; }
+.ph-vt { font-size:13px; color:#999; padding-bottom:8px; position:relative; }
+.ph-vt.active { color:#1a56db; font-weight:600; }
+.ph-vt.active::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:#1a56db; }
+.ph-venue-banner {
+  font-size:11px; color:#d9663a; background:#FFF1E8;
+  border-radius:8px; padding:9px 11px; margin-bottom:16px; line-height:1.5;
+}
+.ph-venue-sub { font-size:14px; font-weight:600; color:#1a1a1a; margin:20px 0 12px; }
+.ph-input { background:#fff; border-radius:9px; padding:11px 12px; font-size:13px; color:#999; border:0.5px solid #e5e5ea; }
+.ph-new-tag {
+  display:inline-block; font-size:9px; color:#d9663a;
+  border:0.5px solid #d9663a; border-radius:3px; padding:0 3px; margin-left:4px; vertical-align:middle;
+}
+.ph-upload-pair { display:flex; gap:10px; margin-bottom:8px; }
+.ph-upload-pair .ph-upload-block { flex:1; margin-bottom:0; }
+.ph-thumb-badge {
+  position:absolute; bottom:2px; right:2px;
+  background:rgba(0,0,0,.55); color:#fff; font-size:8px;
+  padding:0 4px; border-radius:3px;
+}
+.ph-upload-thumb { position:relative; }
+.ph-textarea {
+  width:100%; background:#fff; border:0.5px solid #e5e5ea; border-radius:10px;
+  padding:11px 12px; font-size:12px; font-family:inherit; color:#1a1a1a;
+  min-height:80px; resize:none; line-height:1.6;
+}
+.ph-textarea:focus { outline:none; border-color:#534AB7; }
+.ph-textarea-count { text-align:right; font-size:10px; color:#bbb; margin-top:4px; }
+
+/* ── 审批中界面 ── */
+.ph-approving-icon {
+  width:56px; height:56px; margin:8px auto 14px; border-radius:50%;
+  background:#FFF3CD; display:flex; align-items:center; justify-content:center;
+  font-size:26px;
+}
+.ph-approving-title { text-align:center; font-size:17px; font-weight:600; margin-bottom:4px; }
+.ph-approving-sub { text-align:center; font-size:12px; color:#999; margin-bottom:18px; }
+.ph-appr-list { background:#fff; border-radius:12px; padding:6px 14px; }
+.ph-appr-node { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:0.5px solid #f2f2f2; }
+.ph-appr-node:last-child { border-bottom:none; }
+.ph-appr-dot { width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; }
+.ph-appr-dot.done { background:#1d9e75; }
+.ph-appr-dot.cur  { background:#1a56db; animation:phpulse 1.5s infinite; }
+.ph-appr-dot.wait { background:#d8d8dc; color:#fff; }
+@keyframes phpulse { 0%,100%{box-shadow:0 0 0 0 rgba(26,86,219,.4)} 50%{box-shadow:0 0 0 5px rgba(26,86,219,0)} }
+.ph-appr-info { flex:1; }
+.ph-appr-role { font-size:13px; font-weight:500; color:#1a1a1a; }
+.ph-appr-time { font-size:10px; color:#aaa; margin-top:1px; }
+.ph-appr-node.wait .ph-appr-role { color:#bbb; }
+.ph-appr-badge { font-size:10px; padding:2px 8px; border-radius:10px; }
+.ph-appr-badge.done { background:#d6f5e3; color:#1d7a4f; }
+.ph-appr-badge.cur  { background:#FFF3CD; color:#92660a; }
+.ph-appr-badge.wait { background:#f0f0f0; color:#aaa; }
+
+/* 须知卡死提示 */
+.ph-noopen-mini { font-size:11px; color:#a3372d; background:#FCEBEB; border:0.5px solid #e3a8a8; border-radius:7px; padding:9px 11px; margin:10px 0; line-height:1.6; }
+/* 费用变化提示卡 */
+.ph-fee-notice { margin-top:14px; background:#FFF8E8; border:0.5px solid #e8c84a; border-radius:10px; padding:12px 13px; }
+.ph-fee-title { font-size:13px; font-weight:600; color:#92660a; margin-bottom:8px; }
+.ph-fee-body { font-size:11px; color:#555; line-height:1.7; }
+.ph-fee-kv { display:flex; justify-content:space-between; gap:8px; padding:4px 0; border-top:0.5px dashed #e8d9a8; margin-top:4px; }
+.ph-fee-kv span { color:#999; flex-shrink:0; }
+.ph-fee-kv b { color:#333; font-weight:500; text-align:right; }
+.ph-fee-check { display:flex; align-items:center; gap:7px; font-size:12px; color:#92660a; margin-top:10px; cursor:pointer; }
+.ph-fee-check input { width:15px; height:15px; }
+/* 等待提示横条 */
+.ph-wait-tip { font-size:11px; color:#92660a; background:#FFF3CD; border-radius:7px; padding:8px 11px; margin-bottom:12px; text-align:center; line-height:1.5; }
+
+/* 申请列表卡（招商复核） */
+.ph-list-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.ph-list-title { font-size:15px; font-weight:600; }
+.ph-list-tabs { font-size:11px; color:#aaa; }
+.ph-list-tabs b { color:#1a56db; }
+.ph-list-card { background:#fff; border:0.5px solid #eee; border-radius:12px; padding:13px; }
+.ph-list-store { font-size:13px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+.ph-list-more { font-size:11px; color:#1a56db; font-weight:400; }
+.ph-list-no { font-size:10px; color:#aaa; margin:5px 0 12px; }
+.ph-mini-timeline { display:flex; align-items:center; margin-bottom:12px; }
+.ph-mt-item { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; color:#bbb; }
+.ph-mt-item.cur { color:#1a56db; font-weight:500; }
+.ph-mt-dot { width:9px; height:9px; border-radius:50%; background:#d8d8dc; }
+.ph-mt-item.cur .ph-mt-dot { background:#1a56db; }
+.ph-mt-line { flex:1; height:1.5px; background:#e5e3dc; margin:0 4px; margin-bottom:14px; }
+.ph-list-status { background:#f4f8ff; border-radius:8px; padding:11px; }
+.ph-ls-title { font-size:12px; font-weight:600; color:#1a56db; margin-bottom:5px; }
+.ph-ls-sub { font-size:11px; color:#666; line-height:1.5; margin-bottom:10px; }
+.ph-ls-btn { font-size:12px; padding:6px 16px; border-radius:6px; border:0.5px solid #1a56db; background:#fff; color:#1a56db; cursor:pointer; float:right; }
+.ph-ls-btn-primary { background:#1a56db; color:#fff; }
+
+/* 调整对照表 */
+.ph-adjust-table { width:100%; border-collapse:collapse; font-size:12px; }
+.ph-adjust-table th { padding:7px 9px; background:#f5f4f0; font-weight:500; color:#666; font-size:11px; text-align:left; border:0.5px solid #e8e6df; }
+.ph-adjust-table th.th-after { color:#c0392b; }
+.ph-adjust-table td { padding:7px 9px; border:0.5px solid #e8e6df; color:#444; vertical-align:top; line-height:1.5; }
+.ph-adjust-table td:first-child { color:#888; white-space:nowrap; }
+.ph-adjust-table .td-after { color:#c0392b; }
+.ph-adjust-table .adj-grp td { background:#f9f8f5; font-weight:600; color:#333; font-size:11px; }
+.ph-adjust-table .adj-note td { text-align:center; color:#aaa; font-size:11px; background:#fafafa; cursor:pointer; }
+.ph-adjust-btns { display:flex; gap:10px; margin-top:14px; }
+.ph-adj-btn { flex:1; padding:11px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; border:none; }
+.ph-adj-reedit { background:#f0ede6; color:#444; flex:0 0 100px; }
+.ph-adj-adopt { background:#534AB7; color:#fff; }
+
+/* 大等待提示框 */
+.ph-bigwait { font-size:13px; color:#92660a; background:#FFF8E8; border:0.5px solid #e8c84a; border-radius:10px; padding:16px 16px; line-height:1.8; text-align:center; margin-bottom:14px; }
+
+/* ── 申请列表卡片（统一样式） ── */
+.al-tabs { display:flex; gap:18px; font-size:13px; color:#999; margin-bottom:14px; }
+.al-tabs b { color:#1a56db; font-weight:600; position:relative; }
+.al-tabs b::after { content:''; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:#1a56db; }
+.al-card { background:#fff; border:0.5px solid #eee; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.03); }
+.al-region { font-size:13px; font-weight:600; color:#1a1a1a; display:flex; justify-content:space-between; }
+.al-more { color:#bbb; }
+.al-no { font-size:10px; color:#aaa; margin:6px 0 16px; }
+/* 五节点进度条 */
+.al-steps { display:flex; position:relative; margin-bottom:16px; }
+.al-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; position:relative; }
+.al-step label { font-size:10px; color:#bbb; white-space:nowrap; }
+.al-dot { width:11px; height:11px; border-radius:50%; background:#d8d8dc; border:2px solid #d8d8dc; z-index:1; }
+/* 连接线 */
+.al-step:not(:last-child)::after { content:''; position:absolute; top:5px; left:50%; width:100%; height:2px; background:#e5e3dc; z-index:0; }
+/* 已完成/当前 着色：用 data-active 控制 */
+.al-steps[data-active="0"] .al-step:nth-child(-n+1) .al-dot,
+.al-steps[data-active="1"] .al-step:nth-child(-n+2) .al-dot,
+.al-steps[data-active="2"] .al-step:nth-child(-n+3) .al-dot,
+.al-steps[data-active="3"] .al-step:nth-child(-n+4) .al-dot,
+.al-steps[data-active="4"] .al-step:nth-child(-n+5) .al-dot,
+.al-steps[data-active="5"] .al-step:nth-child(-n+6) .al-dot {
+  background:#1a56db; border-color:#1a56db;
+}
+.al-steps[data-active="0"] .al-step:nth-child(-n+1) label,
+.al-steps[data-active="1"] .al-step:nth-child(-n+2) label,
+.al-steps[data-active="2"] .al-step:nth-child(-n+3) label,
+.al-steps[data-active="3"] .al-step:nth-child(-n+4) label,
+.al-steps[data-active="4"] .al-step:nth-child(-n+5) label,
+.al-steps[data-active="5"] .al-step:nth-child(-n+6) label {
+  color:#1a56db; font-weight:500;
+}
+.al-steps[data-active="1"] .al-step:nth-child(-n+1)::after,
+.al-steps[data-active="2"] .al-step:nth-child(-n+2)::after,
+.al-steps[data-active="3"] .al-step:nth-child(-n+3)::after,
+.al-steps[data-active="4"] .al-step:nth-child(-n+4)::after,
+.al-steps[data-active="5"] .al-step:nth-child(-n+5)::after {
+  background:#1a56db;
+}
+/* 状态卡 */
+.al-status { background:#f4f8ff; border-radius:9px; padding:13px; }
+.al-status-warn { background:#FFF8E8; }
+.al-status-done { background:#EAF6EF; }
+.al-st-title { font-size:13px; font-weight:600; color:#1a56db; margin-bottom:6px; }
+.al-st-sub { font-size:11px; color:#666; line-height:1.6; margin-bottom:0; }
+.al-st-btn { font-size:12px; padding:7px 18px; border-radius:7px; border:0.5px solid #1a56db; background:#fff; color:#1a56db; cursor:pointer; float:right; margin-top:10px; }
+.al-st-btn-primary { background:#1a56db; color:#fff; }
+.al-status::after { content:''; display:table; clear:both; }
+/* 招商调整 mini */
+.ph-adjust-mini { margin-top:12px; background:#fff; border:0.5px solid #eee; border-radius:10px; padding:12px; }
+.ph-adjust-mini-title { font-size:11px; color:#888; margin-bottom:8px; }
+.ph-am-row { font-size:12px; padding:5px 0; display:flex; justify-content:space-between; gap:10px; border-top:0.5px dashed #f0ede6; }
+.ph-am-row span { color:#999; flex-shrink:0; }
+.ph-am-row b { color:#333; font-weight:500; text-align:right; }
+.ph-am-row i { color:#c0392b; font-style:normal; }
+.ph-am-more { font-size:11px; color:#aaa; text-align:center; margin-top:8px; cursor:pointer; }
+
+/* ── 正常/驳回 子切换 ── */
+.demo-switch { display:flex; justify-content:center; gap:0; margin:0 auto 20px; max-width:300px; border:0.5px solid #d3d1c7; border-radius:8px; overflow:hidden; }
+.demo-sw-btn { flex:1; padding:9px 0; font-size:13px; border:none; background:#fff; color:#888; cursor:pointer; font-family:inherit; }
+.demo-sw-btn.active { background:#534AB7; color:#fff; font-weight:500; }
+/* 驳回案例区 */
+.reject-demo-wrap { display:flex; gap:24px; justify-content:center; flex-wrap:wrap; }
+.reject-case { display:flex; flex-direction:column; align-items:center; }
+.reject-case-label { font-size:13px; font-weight:600; color:#c0392b; margin-bottom:12px; }
+.phone-sm { transform:scale(.92); transform-origin:top center; }
+/* 驳回状态卡 */
+.al-status-reject { background:#FCEBEB; }
+.al-st-btn-reject { background:#c0392b; color:#fff; border-color:#c0392b; }
+.ph-appr-dot.reject { background:#c0392b; }
+.ph-appr-badge.reject { background:#FCEBEB; color:#c0392b; }
+.reject-flow-tip { font-size:11px; color:#c0392b; background:#fae6e6; border-radius:7px; padding:9px 11px; margin-top:12px; line-height:1.5; text-align:center; }
 </style>
 </head>
 <body>
-<header>
-  <h1>高端店建店审核链路</h1>
-  <p>新/老商合并视图 · 悬停节点查看详情 · 点击展开查看子流程</p>
-</header>
-<div class="tabs">
-  <div class="tab ac" onclick="sw('combined')">新/老商合并视图</div>
-  <div class="tab" onclick="sw('offline')" id="tab-offline">线下邮件审核链路</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab(event,'tab1')">流程链路</button>
+  <button class="tab-btn" onclick="switchTab(event,'tab2')">三端方案</button>
+  <button class="tab-btn" onclick="switchTab(event,'tab3')">交互演示</button>
 </div>
 
-<div class="panel show" id="panel-combined">
-  <div class="ib" style="background:var(--tl);border:1px solid var(--tb);color:#0a6040">
-    <span style="flex-shrink:0;font-weight:600">新/老商合并视图</span>
-    <span style="margin-left:4px">— 差异部分分列展示，提交选址报告起合并为同一链路。</span>
+<div id="tab1" class="tab-panel active">
+<div class="flow">
+  <h1>门店迁址全流程链路</h1>
+
+  <!-- ══════ 迁址合理性审批 新链路 ══════ -->
+  <div class="group group-new">
+    <div class="group-header">
+      <span class="group-title">迁址合理性审批</span>
+      <span class="new-hint">新增线上化链路</span>
+    </div>
+
+    <!-- 加盟商发起 -->
+    <div class="node c-purple">
+      <div class="node-title">加盟商发起迁址申请</div>
+      <div class="node-sub">蓝虎 App 自助发起，系统校验底线要求</div>
+    </div>
+    <div class="conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- 加盟商填写新址信息（含招商确认、采纳修改意见） -->
+    <div class="node c-purple" id="fillNode">
+      <div class="node-title">加盟商填写新址信息</div>
+      <div class="node-sub">招商确认 · 加盟商采纳修改意见并确认</div>
+    </div>
+    <div class="conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- 菱形：是否涉及工位变更 -->
+    <div class="diamond-wrap">
+      <div class="diamond"><div class="diamond-text">是否涉及<br>工位变更？</div></div>
+    </div>
+
+    <!-- 三向分叉连接线 -->
+    <div class="fork3">
+      <div class="fork3-stem"></div>
+      <div class="fork3-bar"></div>
+      <div class="fork3-drops">
+        <div class="fork3-drop"></div>
+        <div class="fork3-drop"></div>
+        <div class="fork3-drop"></div>
+      </div>
+    </div>
+
+    <!-- 三路分支 -->
+    <div class="branch3">
+
+      <!-- 路径A：不涉及 -->
+      <div class="branch3-col">
+        <div class="branch3-label">否 · 不涉及</div>
+        <div class="branch-pass-arrow"><div class="bpa-line"></div><div class="bpa-head"></div></div>
+      </div>
+
+      <!-- 路径B：涉及工位变更·不升降级 -->
+      <div class="branch3-col">
+        <div class="branch3-label">是 · 不涉及升降级</div>
+        <div class="node c-purple"><div class="node-title" style="font-size:12px">工位变更审批</div></div>
+        <div class="bc"><div class="conn-line" style="height:10px"></div><div class="conn-arrow"></div></div>
+        <div class="node c-green2"><div class="node-title" style="font-size:12px">✓ 审批通过</div></div>
+        <div class="reject-arrow">✕ 不通过 ↩ 退回填写新址信息</div>
+      </div>
+
+      <!-- 路径C：涉及工位变更·升降级 -->
+      <div class="branch3-col">
+        <div class="branch3-label">是 · 涉及升降级</div>
+        <div class="node c-purple"><div class="node-title" style="font-size:12px">工位变更 + 升降级审批</div></div>
+        <div class="bc"><div class="conn-line" style="height:10px"></div><div class="conn-arrow"></div></div>
+        <div class="node c-green2"><div class="node-title" style="font-size:12px">✓ 审批通过</div></div>
+        <div class="reject-arrow">✕ 不通过 ↩ 退回填写新址信息</div>
+      </div>
+
+    </div>
+    <div class="tail-label" style="margin-top:10px">三路汇入选址审核 ↓</div>
   </div>
-  <div class="flow">
 
-    <!-- 差异区 -->
-    <div style="width:100%;max-width:860px;display:flex;gap:16px;align-items:flex-start;margin-bottom:0">
+  <!-- 段间连接 -->
+  <div class="sec-conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
 
-      <!-- 老商列 -->
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;background:var(--ol);border:1.5px solid var(--ob);border-radius:12px;padding:16px 12px;">
-        <div style="font-size:13px;font-weight:600;color:var(--old);margin-bottom:12px;letter-spacing:.02em">老商专属</div>
-        <div class="node nd-old" style="min-width:200px;width:100%"><div class="lb" style="font-size:13px">提交意向金</div><div class="sb">跳过准入，直接进入资质审核</div></div>
-        <div class="arrw t12 o"></div>
-        <div class="node nd-old dash" style="min-width:200px;width:100%;position:relative">
-          <div class="lb" style="font-size:12px">系统初步高端资质审核</div>
-          <div class="sb">自动带出老商历史数据判断</div>
-          <!-- tooltip 向左弹出 -->
-          <div style="display:none;position:absolute;z-index:200;right:calc(100% + 12px);top:50%;transform:translateY(-50%);background:#1a1714;color:#fff;border-radius:8px;padding:12px 16px;min-width:220px;font-size:12px;line-height:1.8;box-shadow:0 8px 28px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap;" class="tip-l">
-            <div style="position:absolute;left:100%;top:50%;transform:translateY(-50%);border:6px solid transparent;border-left-color:#1a1714;"></div>
-            <div style="font-weight:600;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:5px;margin-bottom:5px;">系统自动带出字段</div>
-            <div style="color:#bbb;">① <span style="color:#fff;font-weight:500;">是否有"进行中案件"</span></div>
-            <div style="color:#bbb;">② <span style="color:#fff;font-weight:500;">25年至今实控门店净增数</span></div>
-            <div style="color:#bbb;">③ <span style="color:#fff;font-weight:500;">近1年满意度</span></div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;width:100%;margin-top:4px;">
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-            <div class="al r" style="margin-top:6px;font-size:10px">不通过</div>
-            <div class="arrw r t12"></div>
-            <div class="node nd-gray pill" style="min-width:110px;padding:6px 10px"><div class="lb" style="font-size:11px">走工场店流程</div></div>
-          </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-            <div class="al g" style="margin-top:6px;font-size:10px">通过</div>
-            <div style="width:2px;height:36px;background:#0e8c72;margin-top:4px;"></div>
-          </div>
-        </div>
-      </div>
+  <!-- ══════ 原有链路 ══════ -->
+  <div class="group group-existing">
 
-      <!-- 新商列 -->
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;background:var(--nl);border:1.5px solid var(--nb);border-radius:12px;padding:16px 12px;">
-        <div style="font-size:13px;font-weight:600;color:var(--new);margin-bottom:12px;letter-spacing:.02em">新商专属</div>
-        <div class="node nd-new" style="min-width:200px;width:100%"><div class="lb" style="font-size:13px">资料提交</div></div>
-        <div class="arrw b t10"></div>
-        <div class="node nd-new" style="min-width:200px;width:100%"><div class="lb" style="font-size:13px">面谈审核</div></div>
-        <div class="arrw b t10"></div>
-        <div class="node nd-new" style="min-width:200px;width:100%"><div class="lb" style="font-size:13px">学习培训</div></div>
-        <div class="arrw b t10"></div>
-        <div class="node nd-new" style="min-width:200px;width:100%;position:relative">
-          <div class="lb" style="font-size:13px">准入审核（商管理）</div>
-          <div style="display:none;position:absolute;z-index:200;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:#1a1714;color:#fff;border-radius:8px;padding:12px 16px;min-width:200px;font-size:12px;line-height:1.8;box-shadow:0 8px 28px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap;" class="tip-r">
-            <div style="position:absolute;right:100%;top:50%;transform:translateY(-50%);border:6px solid transparent;border-right-color:#1a1714;"></div>
-            <div style="font-weight:600;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:5px;margin-bottom:5px;">准入审核</div>
-            <div style="color:#bbb;">商管理审核通过后方可进入选址</div>
-          </div>
-        </div>
-        <div style="width:2px;height:36px;background:#0e8c72;margin-top:4px;"></div>
-      </div>
+    <!-- 选址 -->
+    <div class="node c-purple"><div class="node-title">选址审核</div><div class="node-sub">商圈审核 · 工程审核 · 选址团队审核</div></div>
+    <div class="conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
 
-    </div>
+    <!-- 签署合同 -->
+    <div class="node c-gray"><div class="node-title">签署合同</div><div class="node-sub">系统生成 · 加盟商电子签署 · 法务用印 · 存档</div></div>
+    <div class="conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
 
-    <!-- 汇流 -->
-    <div style="width:100%;max-width:860px;position:relative;height:22px;">
-      <div style="position:absolute;top:0;left:25%;right:25%;height:2px;background:#0e8c72;border-radius:1px;"></div>
-      <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);width:2px;height:20px;background:#0e8c72;">
-        <div style="position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0e8c72;border-bottom:none;"></div>
-      </div>
-    </div>
-    <div style="background:var(--tl);border:1.5px dashed var(--tb);border-radius:8px;padding:5px 18px;font-size:11px;color:#0a6040;margin-bottom:6px">新/老商共同流程</div>
+    <!-- 工程装修 -->
+    <div class="node c-gray"><div class="node-title">工程装修</div><div class="node-sub">创建景顿工单 · 验收完成回传</div></div>
+    <div class="conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
 
-    
-    <div class="node nd-teal" style="min-width:280px;position:relative">
-      <div class="lb">提交选址报告</div>
-      <div class="sb">系统自动判定是否满足高端店点址审核要求</div>
-      
-<div class="eb" style="font-size:10px;padding:3px 8px;margin-top:4px" onclick="tog(this,'combined_site_qual')"><span>▶</span> 查看判定条件</div>
-<div class="ex" id="combined_site_qual" style="max-width:300px;text-align:left">
-  <div style="font-size:11px;font-weight:600;color:var(--ts);margin-bottom:6px">系统自动判定条件（同时满足）</div>
-  <div class="arow"><div class="adot" style="background:#0e8c72"></div><div class="atxt" style="font-size:11px">门头宽度 ≥ 18m</div></div>
-  <div class="arow"><div class="adot" style="background:#0e8c72"></div><div class="atxt" style="font-size:11px">工位数 ≥ 4+3</div></div>
-  <div class="arow"><div class="adot" style="background:#0e8c72"></div><div class="atxt" style="font-size:11px">北上广深苏州 核心区/高端社区</div></div>
+    <!-- 上线前审批 -->
+    <div class="node c-gray"><div class="node-title">上线前审批</div><div class="node-sub">营业前任务增加：确认该店是否有进行中铺货</div></div>
+    <div class="conn"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- 完成 -->
+    <div class="node c-gray"><div class="node-title">迁址完成</div></div>
+  </div>
+
 </div>
-    </div>
+</div><!-- /tab1 -->
 
-    <div style="width:100%;max-width:700px;display:flex;gap:0;align-items:flex-start;justify-content:center;">
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-        <div class="al r" style="margin-top:8px">不满足高端店点址审核要求</div>
-        <div class="arrw r"></div>
-        <div class="node nd-teal dash" style="min-width:190px"><div class="lb">商圈沟通加盟商</div><div class="sb">评估点址是否可调整达标</div></div>
-        <div class="arrw"></div>
-        <div class="node nd-teal dash" style="min-width:190px"><div class="lb">加盟商重新修改提交</div><div class="sb">按商圈建议调整方案后重新提交</div></div>
-        <div style="display:flex;gap:0;width:100%;align-items:flex-start;justify-content:center;">
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-            <div class="al r" style="margin-top:6px">无法满足</div>
-            <div class="arrw r"></div>
-            <div class="node nd-gray pill" style="min-width:120px"><div class="lb" style="font-size:12px">正常工场店流程</div><div class="sb">选址→签约→装修→上线</div></div>
+<!-- ════════════ TAB 2 三端方案 ════════════ -->
+<div id="tab2" class="tab-panel">
+  <div class="t2-head">
+    <h1 style="margin-bottom:6px">门店迁址线上化 · 三端方案</h1>
+    <p class="t2-sub">迁址全流程线上化，加盟商端发起、BD 端跟进、中台端管理，协同推进</p>
+  </div>
+  <div class="t2-cards t2-cards-3">
+
+    <!-- 加盟商端 -->
+    <div class="t2-card">
+      <div class="t2-card-head t2-blue">
+        <div class="t2-card-icon t2-icon-blue">🐯</div>
+        <div>
+          <div class="t2-card-role">加盟商端</div>
+          <div class="t2-card-sys">蓝虎 App</div>
+        </div>
+      </div>
+      <div class="t2-card-title">发起迁址申请</div>
+      <ol class="t2-steps">
+        <li><b>申请迁址入口</b>进入蓝虎 → 切换成门店 → 点击「全部」→ 点击「门店迁址」→ 发起迁址申请</li>
+        <li><b>填写新址信息</b>加盟商填写新址信息，含工位布局变更审核、升降级审核、商圈审核、工程审核、选址团队审核</li>
+        <li><b>合同签署</b>系统推送合同，加盟商在线签署</li>
+        <li><b>门店上线</b>营业前任务增加确认该店是否有进行中铺货，完成后运管操作上线，门店正式上线</li>
+      </ol>
+      <div class="t2-mock-label">示例界面</div>
+      <div class="t2-mock">
+        <div class="al-tabs" style="margin-bottom:12px"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+        <div class="al-card">
+          <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+          <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+          <div class="al-steps" data-active="1">
+            <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-            <div class="al g" style="margin-top:6px">可满足高端店审核要求</div>
-            <div style="width:2px;height:32px;background:#0e8c72;margin-top:4px;"></div>
+          <div class="al-status al-status-warn">
+            <div class="al-st-title" style="color:#92660a">工位布局变更审核中</div>
+            <div class="al-st-sub">检测到工位布局发生变更，触发运管审核，请耐心等待</div>
           </div>
         </div>
       </div>
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-        <div style="height:180px;"></div>
-        <div class="al g">满足高端店点址审核要求</div>
-        <div style="width:2px;height:32px;background:#0e8c72;margin-top:4px;"></div>
+      <div class="t2-progress-cta" onclick="openProgressDemo()">📱 点击查看完整进度条页面演示 ›</div>
+    </div>
+
+    <!-- 管理端 卡片已移除 -->
+
+    <!-- BD端 -->
+    <div class="t2-card">
+      <div class="t2-card-head t2-purple">
+        <div class="t2-card-icon t2-icon-purple">📱</div>
+        <div>
+          <div class="t2-card-role">BD 端</div>
+          <div class="t2-card-sys">易行 App</div>
+        </div>
+      </div>
+      <div class="t2-card-title">工单全流程展示</div>
+      <ol class="t2-steps">
+        <li><b>工单列表入口</b>易行「工单」Tab 下新增「迁址申请」分类，BD 查看名下所有迁址工单</li>
+        <li><b>审批节点明细</b>完整展示每个审批节点：角色、状态（待审/审批中/已通过/已驳回）、审批时间及意见</li>
+        <li><b>当前节点高亮 + 超时标红</b>高亮标注「待 XX 审批」，超时节点自动标红提醒</li>
+        <li><b>条件节点状态可见</b>升降级节点触发状态：未触发 / 处理中 / 已完成</li>
+        <li><b>选址与协议进度</b>展示新址填写、招商修改、协议签署、用印、存档进度</li>
+        <li><b>消息提醒</b>工单流转至 BD/BDM 节点时推送易行通知，提醒及时处理</li>
+      </ol>
+      <div class="t2-mock-label">示例界面</div>
+      <div class="t2-mock">
+        <div class="t2-mock-title">工单详情</div>
+        <div class="t2-yx-no">TH-REL-20260616-77821</div>
+        <div class="t2-yx-store">南昌城南大道店 · 迁址申请</div>
+        <div class="t2-yx-label">审批进度</div>
+        <div class="t2-yx-node">
+          <span class="t2-yx-dot done">✓</span>
+          <div class="t2-yx-info"><div class="t2-yx-role">运管 · 工位布局变更</div><div class="t2-yx-time">06-16 09:52</div></div>
+          <span class="t2-st-done">已通过</span>
+        </div>
+        <div class="t2-yx-node">
+          <span class="t2-yx-dot cur">●</span>
+          <div class="t2-yx-info"><div class="t2-yx-role">商圈审核 · 待审批</div><div class="t2-yx-time">当前节点</div></div>
+          <span class="t2-st-warn">审批中</span>
+        </div>
+        <div class="t2-yx-node dim">
+          <span class="t2-yx-dot wait">3</span>
+          <div class="t2-yx-info"><div class="t2-yx-role">工程审核</div></div>
+          <span class="t2-st-wait">待审批</span>
+        </div>
+        <div class="t2-yx-node dim">
+          <span class="t2-yx-dot wait">4</span>
+          <div class="t2-yx-info"><div class="t2-yx-role">选址团队审核</div></div>
+          <span class="t2-st-wait">待审批</span>
+        </div>
       </div>
     </div>
 
-    <div style="width:100%;max-width:700px;position:relative;height:22px;">
-      <div style="position:absolute;top:0;left:25%;right:25%;height:2px;background:#0e8c72;border-radius:1px;"></div>
-      <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);width:2px;height:20px;background:#0e8c72;">
-        <div style="position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0e8c72;border-bottom:none;"></div>
+    <!-- 中台端 -->
+    <div class="t2-card">
+      <div class="t2-card-head t2-green">
+        <div class="t2-card-icon t2-icon-green">🖥️</div>
+        <div>
+          <div class="t2-card-role">中台端</div>
+          <div class="t2-card-sys">运营服务平台</div>
+        </div>
+      </div>
+      <div class="t2-card-title">迁址建店申请单管理</div>
+      <ol class="t2-steps">
+        <li><b>新增迁址建店申请单</b>工场店招商管理下新增「迁址建店申请单」入口，集中管理所有迁址工单</li>
+        <li><b>顶部流程进度条</b>选址 → 签约 → 建店 → 工程装修 → 上线申请，各节点带待办数量角标</li>
+        <li><b>多维筛选检索</b>按申请编号、客户手机、客户姓名、省市区镇、商机编号等检索</li>
+        <li><b>申请单列表</b>展示申请编号、商机编号、建店类型、加盟商类型、提交日期、状态等</li>
+        <li><b>详情与流转</b>点击详情查看完整字段、审批流转、合同与工单记录</li>
+      </ol>
+      <div class="t2-mock-label">示例界面</div>
+      <div class="t2-mock t2-mock-admin">
+        <div class="adm-bar">运营服务平台 · 工场店招商管理 / 迁址建店申请单</div>
+        <div class="adm-flow">
+          <span class="adm-flow-step">选址<i>201</i></span>
+          <span class="adm-flow-step">签约<i>40</i></span>
+          <span class="adm-flow-step">建店</span>
+          <span class="adm-flow-step">工程装修<i>298</i></span>
+          <span class="adm-flow-step">上线申请<i>18</i></span>
+        </div>
+        <table class="adm-table">
+          <thead><tr><th>申请编号</th><th>建店类型</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>…3200508</td><td>迁址建店</td><td><span class="t2-st-warn">选址中</span></td></tr>
+            <tr><td>…2660032</td><td>迁址建店</td><td><span class="t2-st-warn">工程装修</span></td></tr>
+            <tr><td>…1410022</td><td>迁址建店</td><td><span class="t2-st-done">已上线</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="node nd-teal" style="min-width:230px"><div class="lb">系统提示商圈</div><div class="sb">点址满足高端店审核要求，是否让招商发起额外工单？</div></div>
-    <div class="arrw t16" style="background:#0e8c72;"></div>
-    <div class="node nd-teal" style="min-width:230px"><div class="lb">招商发起额外工单</div><div class="sb">商圈让加盟商确认做高端店并填写字段</div></div>
-    <div class="arrw t12"></div>
-    <div class="node nd-teal" style="min-width:230px"><div class="lb">加盟商确认 + 提交资料</div><div class="sb">新/老商字段不同，系统自动识别</div></div>
-    <div class="eb" onclick="tog(this,'combined_sub')"><span>▶</span> 查看新/老商提交字段</div>
-    <div class="ex" id="combined_sub" style="max-width:480px">
-      <div style="display:flex;gap:10px;">
-        <div style="flex:1;background:#fef4e8;border:1.5px solid #f0c888;border-radius:8px;padding:10px;">
-          <div style="font-size:12px;font-weight:700;color:#e07a2f;margin-bottom:6px;">老商</div>
-          <div class="arow"><div class="adot" style="background:#e07a2f"></div><div class="atxt" style="font-size:11px">资金证明截图 ≥ 80w（银行卡）</div></div>
-          <div style="font-size:10px;color:var(--ts);margin-top:4px;line-height:1.6;">系统自动带出：<br>进行中案件 / 净增数 / 近1年满意度</div>
+  </div>
+</div><!-- /tab2 -->
+
+<!-- ════════════ TAB 3 交互演示 ════════════ -->
+<div id="tab3" class="tab-panel">
+  <div class="t2-head" style="text-align:center;max-width:420px;">
+    <h1 style="margin-bottom:6px">蓝虎 App · 迁址申请演示</h1>
+    <p class="t2-sub">模拟加盟商在 App 内逐步操作，点击「下一步」往下走</p>
+  </div>
+
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+      <div class="ph-status"><span>12:00</span><span>▲ ❶ ▊</span></div>
+      <div class="ph-nav">
+        <span class="ph-back" onclick="prevStep()">‹</span>
+        <span class="ph-title" id="phTitle">我的应用</span>
+        <span style="width:16px"></span>
+      </div>
+      <div class="ph-progress" id="phProgress"><div class="ph-progress-bar" id="phProgressBar"></div></div>
+
+      <div class="ph-body">
+
+        <!-- STEP 0 入口 -->
+        <div class="ph-step active" data-step="0">
+          <div class="ph-section-label">招商加盟</div>
+          <div class="ph-appgrid">
+            <div class="ph-app"><div class="ph-app-ic" style="background:#FFF3E8">🏪</div><span>我要开店</span></div>
+            <div class="ph-app"><div class="ph-app-ic" style="background:#EBF2FF">📄</div><span>安装费协议</span></div>
+            <div class="ph-app"><div class="ph-app-ic" style="background:#E6FBF4">🔍</div><span>查看商圈</span></div>
+            <div class="ph-app"><div class="ph-app-ic" style="background:#EEFBF0">📢</div><span>我要推荐</span></div>
+            <div class="ph-app"><div class="ph-app-ic" style="background:#F2F0FF">💰</div><span>门店融资</span></div>
+            <div class="ph-app"><div class="ph-app-ic" style="background:#EBF2FF">🔄</div><span>门店转让</span></div>
+            <div class="ph-app"><div class="ph-app-ic" style="background:#FFF3E8">⚙️</div><span>工位增拓</span></div>
+            <div class="ph-app ph-app-hl" onclick="nextStep()"><div class="ph-app-ic">📍</div><span>门店迁址</span></div>
+          </div>
+          <div class="ph-hint-box">👆 点击「门店迁址」进入申请</div>
         </div>
-        <div style="flex:1;background:#eef0fe;border:1.5px solid #b8c2f8;border-radius:8px;padding:10px;">
-          <div style="font-size:12px;font-weight:700;color:#4f63e8;margin-bottom:6px;">新商</div>
-          <div class="arow"><div class="adot" style="background:#4f63e8"></div><div class="atxt" style="font-size:11px">近3年工作经历</div></div>
-          <div class="arow"><div class="adot" style="background:#4f63e8"></div><div class="atxt" style="font-size:11px">签署承诺函</div></div>
-          <div class="arow"><div class="adot" style="background:#4f63e8"></div><div class="atxt" style="font-size:11px">资金证明截图 ≥ 80w（银行卡）</div></div>
+
+        <!-- STEP 1 意向发起 -->
+        <div class="ph-step" data-step="1">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="0">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">发起迁址申请</div>
+              <div class="al-st-sub">请确认迁址申请信息，提交后进入选址环节</div>
+              <button class="al-st-btn">立即发起</button>
+            </div>
+          </div>
         </div>
+
+        <!-- STEP 2 填写场地可行性报告 -->
+        <div class="ph-step" data-step="2">
+          <div class="ph-section-label">填写场地可行性报告</div>
+          <div class="ph-form">
+            <div class="ph-field"><label>新址地址</label><input type="text" class="ph-real-input" value="南昌市青山湖区城南大道 88 号"></div>
+            <div class="ph-field">
+              <label>地图选址（系统自动计算与原门店直线距离）</label>
+              <div class="ph-map-select">
+                <div class="ph-map-canvas" id="phMapCanvas" onclick="phMapClick(event)">
+                  <div class="ph-map-origin" title="原门店">🏠 原门店</div>
+                  <div class="ph-map-pin" id="phMapPin" style="left:62%;top:45%">📍</div>
+                  <div class="ph-map-hint">点击地图选择新址位置</div>
+                </div>
+                <div class="ph-map-dist" id="phMapDist">当前选址距原门店：<b>0.8 km</b> ✓ 在可迁址范围内</div>
+              </div>
+            </div>
+            <div class="ph-field-row">
+              <div class="ph-field"><label>签约面积（㎡）</label><input type="number" class="ph-real-input" value="317"></div>
+              <div class="ph-field"><label>实际经营面积（㎡）</label><input type="number" class="ph-real-input" value="300"></div>
+            </div>
+            <div class="ph-field"><label>门店租金（元/月）</label><input type="number" class="ph-real-input" value="17435"></div>
+            <div class="ph-field-row">
+              <div class="ph-field"><label>机修工位</label><input type="number" class="ph-real-input" value="4"></div>
+              <div class="ph-field"><label>四轮定位工位</label><input type="number" class="ph-real-input" value="1"></div>
+            </div>
+            <div class="ph-field-row">
+              <div class="ph-field"><label>美容工位</label><input type="number" class="ph-real-input" value="0"></div>
+              <div class="ph-field"><label>洗美工位</label><input type="number" class="ph-real-input" value="2"></div>
+            </div>
+            <div class="ph-field"><label>门洞个数</label><input type="number" class="ph-real-input" value="2"></div>
+            <div class="ph-field"><label>是否临街且无遮挡</label><div class="ph-input">是 ›</div></div>
+            <div class="ph-venue-sub">门店招牌</div>
+            <div class="ph-upload-block" style="margin-bottom:8px">
+              <div class="ph-upload-title">门店招牌图</div>
+              <div class="ph-upload-row"><div class="ph-upload-add">📷<br>添加图片</div><div class="ph-upload-thumb">🏪<span class="ph-thumb-badge">3张</span></div></div>
+            </div>
+            <div class="ph-field-row">
+              <div class="ph-field"><label>长度（米）</label><input type="number" class="ph-real-input" placeholder="请输入"></div>
+              <div class="ph-field"><label>宽度（米）</label><input type="number" class="ph-real-input" placeholder="请输入"></div>
+            </div>
+            <div class="ph-venue-sub">指引招牌</div>
+            <div class="ph-upload-pair">
+              <div class="ph-upload-block"><div class="ph-upload-title">指引招牌图</div><div class="ph-upload-add">📷<br>添加图片</div></div>
+              <div class="ph-upload-block"><div class="ph-upload-title">相对位置图</div><div class="ph-upload-add">📷<br>添加图片</div></div>
+            </div>
+            <div class="ph-venue-sub">车辆动线图</div>
+            <div class="ph-upload-block" style="margin-bottom:8px">
+              <div class="ph-upload-row"><div class="ph-upload-add">📷<br>添加图片</div><div class="ph-upload-thumb">🗺️<span class="ph-thumb-badge">3张</span></div></div>
+            </div>
+            <div class="ph-field"><label>100 米内停车总数</label><input type="number" class="ph-real-input" placeholder="请输入"></div>
+            <div class="ph-venue-sub">＊ 招商场地拍照打卡</div>
+            <div class="ph-upload-block" style="margin-bottom:8px">
+              <div class="ph-upload-row"><div class="ph-upload-add">📷<br>添加图片</div><div class="ph-upload-thumb">📸<span class="ph-thumb-badge">3张</span></div></div>
+            </div>
+            <div class="ph-upload-pair">
+              <div class="ph-upload-block"><div class="ph-upload-title">＊ 室内视频</div><div class="ph-upload-add">⬆️<br>立即上传</div></div>
+              <div class="ph-upload-block"><div class="ph-upload-title">＊ 室外视频</div><div class="ph-upload-add">⬆️<br>立即上传</div></div>
+            </div>
+            <div class="ph-venue-sub">备注</div>
+            <textarea class="ph-textarea" placeholder="关于场地相关信息，若还有需要填写，请在此处补充说明" maxlength="200"></textarea>
+            <div class="ph-textarea-count">0/200</div>
+          </div>
+        </div>
+
+        <!-- STEP 3 待招商确认 -->
+        <div class="ph-step" data-step="3">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="1">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">填写场地可行性报告</div>
+              <div class="al-st-sub">已提交场地可行性报告，待招商确认</div>
+              <button class="al-st-btn">查看详情</button>
+            </div>
+          </div>
+          <div class="ph-appr-list" style="margin-top:12px">
+            <div class="ph-appr-node"><span class="ph-appr-dot cur">●</span><div class="ph-appr-info"><div class="ph-appr-role">招商确认</div><div class="ph-appr-time">招商实地勘验并复核场地信息</div></div><span class="ph-appr-badge cur">确认中</span></div>
+          </div>
+        </div>
+
+        <!-- STEP 4 确认招商调整 -->
+        <div class="ph-step" data-step="4">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="1">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">确认场地可行性报告</div>
+              <div class="al-st-sub">招商已实地勘检并修改了 4 项信息，请您确认</div>
+              <button class="al-st-btn al-st-btn-primary">立即确认</button>
+            </div>
+          </div>
+          <div class="ph-adjust-mini">
+            <div class="ph-adjust-mini-title">招商调整内容（调整前 → 调整后）</div>
+            <div class="ph-am-row"><span>场地地址</span><b>沪闵路169号 → <i>沪闵路180号</i></b></div>
+            <div class="ph-am-row"><span>钣喷工位数</span><b>4 → <i>5</i></b></div>
+            <div class="ph-am-row"><span>租期</span><b>1年 → <i>2年</i></b></div>
+            <div class="ph-am-more">查看 15 项无调整内容 ⌄</div>
+          </div>
+        </div>
+
+        <!-- STEP 5 运管审核工位布局变更 -->
+        <div class="ph-step" data-step="5">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="1">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status al-status-warn">
+              <div class="al-st-title" style="color:#92660a">工位布局变更审核中</div>
+              <div class="al-st-sub">检测到工位布局以及门店等级发生变更，请耐心等待审核结果。</div>
+            </div>
+          </div>
+          <div class="reject-demo-link" onclick="openRejectExample()">查看驳回示例 ›</div>
+        </div>
+
+        <!-- STEP 6 选址审核中 -->
+        <div class="ph-step" data-step="6">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="1">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">选址审核中</div>
+              <div class="al-st-sub">商圈、工程、选址团队审核进行中，请耐心等待</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 7 确认合同信息 -->
+        <div class="ph-step" data-step="7">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="2">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">确认合同信息</div>
+              <div class="al-st-sub">选址已提交通过，请确认合同信息</div>
+              <button class="al-st-btn al-st-btn-primary">立即确认</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 8 上传合同材料 -->
+        <div class="ph-step" data-step="8">
+          <div class="ph-section-label">确认合同信息 · 材料上传</div>
+          <div class="ph-upload-tabs">
+            <span class="ph-ut done">披露</span>
+            <span class="ph-ut done">文书送达</span>
+            <span class="ph-ut done">信息确认</span>
+            <span class="ph-ut active">材料上传</span>
+            <span class="ph-ut">预览</span>
+          </div>
+          <div class="ph-upload-block">
+            <div class="ph-upload-title">＊ 门店产权证明 / 使用权证明 / 租赁合同</div>
+            <div class="ph-upload-row"><div class="ph-upload-thumb">📄</div><div class="ph-upload-add">＋<br>添加图片</div></div>
+          </div>
+          <div class="ph-upload-block">
+            <div class="ph-upload-title">＊ 房租缴纳凭证（转账回执单截图 / 照片）</div>
+            <div class="ph-upload-row"><div class="ph-upload-thumb">🧾</div><div class="ph-upload-add">＋<br>添加图片</div></div>
+          </div>
+          <div class="ph-field" style="margin-top:6px">
+            <label>＊ 房屋起租日期</label>
+            <input type="text" class="ph-real-input" value="2023-09-15">
+          </div>
+        </div>
+
+        <!-- STEP 9 实名认证 -->
+        <div class="ph-step" data-step="9">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="2">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">实名认证</div>
+              <div class="al-st-sub">合同已提交，待实名认证后在线签署</div>
+              <button class="al-st-btn al-st-btn-primary">立即认证</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 10 合同审核中 -->
+        <div class="ph-step" data-step="10">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="2">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">合同审核中</div>
+              <div class="al-st-sub">运管审核租赁合同中，3 个工作日内完成</div>
+              <button class="al-st-btn">查看合同</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 11 工程装修 -->
+        <div class="ph-step" data-step="11">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="3">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">工程装修中</div>
+              <div class="al-st-sub">系统已创建景顿施工工单，装修完成后回传验收结果</div>
+              <button class="al-st-btn">查看进度</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 12 上线前审批中 -->
+        <div class="ph-step" data-step="12">
+          <div class="al-tabs"><b>进行中</b><span>已完成</span><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="4">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status">
+              <div class="al-st-title">上线前审批中</div>
+              <div class="al-st-sub">营业前任务增加：确认该店是否有进行中铺货</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 13 迁址完成 -->
+        <div class="ph-step" data-step="13">
+          <div class="al-tabs"><span>进行中</span><b>已完成</b><span>已终止</span></div>
+          <div class="al-card">
+            <div class="al-region">申请区域：南昌市·青山湖区<span class="al-more">···</span></div>
+            <div class="al-no">工单号：2342 3423 4324 3242 3423 复制</div>
+            <div class="al-steps" data-active="5">
+              <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+              <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+            </div>
+            <div class="al-status al-status-done">
+              <div class="al-st-title" style="color:#1d7a4f">🎉 门店已成功上线</div>
+              <div class="al-st-sub">迁址完成，新址定位已同步地图 POI，门店已在新址正式营业</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ph-footer" id="phFooter">
+        <button class="ph-btn-ghost" id="phBackBtn" onclick="prevStep()" style="display:none">上一步</button>
+        <button class="ph-btn-main" id="phNextBtn" onclick="nextStep()">下一步</button>
       </div>
     </div>
-    <div class="arrw t12"></div>
-    <div class="eb" onclick="tog(this,'combined_apv')"><span>▶</span> 多方确认流程</div>
-    <div class="ex" id="combined_apv">
-<div style="font-size:11px;color:var(--ts);margin-bottom:8px;font-weight:600">额外工单 · 多方依次确认</div>
-<div class="arow"><div class="adot" style="background:#5060d0"></div><div class="atxt">招商 确认</div></div>
-<div class="arow"><div class="adot" style="background:#5060d0"></div><div class="atxt">BDM 确认</div></div>
-<div class="arow"><div class="adot" style="background:#5060d0"></div><div class="atxt">新/老商负责人 确认</div></div>
-<div class="arow"><div class="adot" style="background:#5060d0"></div><div class="atxt">商管理 确认</div></div>
-<div class="arow"><div class="adot" style="background:#0e8c72"></div><div class="atxt">商圈 确认 <span class="sbadge">系统自动</span></div></div>
-<div class="arow"><div class="adot" style="background:#5060d0"></div><div class="atxt">发管负责人 终审</div></div></div>
-    <div style="display:flex;gap:32px;align-items:flex-start;justify-content:center;width:100%;max-width:480px;margin-top:0">
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-        <div class="al r" style="margin-top:6px;font-size:10px">驳回</div>
-        <div class="arrw r t16"></div>
-        <div class="node nd-gray pill" style="min-width:140px"><div class="lb" style="font-size:11px">走工场店流程</div><div class="sb" style="font-size:10px">选址→签约→装修→上线</div></div>
+  </div>
+  <div class="t3-reset"><button onclick="resetWizard()">↺ 重新演示</button></div>
+
+</div><!-- /tab3 -->
+
+<!-- 两端方案·进度条页面演示 Modal -->
+<div class="overlay" id="progressDemoOverlay" onclick="closeProgressDemo()">
+  <div class="pd-modal" onclick="event.stopPropagation()">
+    <div class="pd-modal-head">
+      <span>加盟商端 · 进度条页面演示</span>
+      <button class="pd-close" onclick="closeProgressDemo()">×</button>
+    </div>
+    <div class="pd-modal-body">
+      <p class="pd-modal-note">加盟商在「申请列表」中始终可见五节点进度条与当前状态，每一步状态卡随流程推进更新：</p>
+      <div class="pd-cards">
+        <!-- 提交选址 -->
+        <div class="pd-card">
+          <div class="al-region" style="font-size:12px">申请区域：南昌市·青山湖区</div>
+          <div class="al-steps" data-active="2" style="margin-top:10px">
+            <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+          </div>
+          <div class="al-status" style="margin-top:4px"><div class="al-st-title" style="font-size:12px">选址审核中</div><div class="al-st-sub">运管工位变更已通过，选址审核进行中</div></div>
+        </div>
+        <!-- 合同签约 -->
+        <div class="pd-card">
+          <div class="al-region" style="font-size:12px">申请区域：南昌市·青山湖区</div>
+          <div class="al-steps" data-active="3" style="margin-top:10px">
+            <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+          </div>
+          <div class="al-status" style="margin-top:4px"><div class="al-st-title" style="font-size:12px">确认合同信息</div><div class="al-st-sub">选址已通过，请确认合同信息</div></div>
+        </div>
+        <!-- 工程装修 -->
+        <div class="pd-card">
+          <div class="al-region" style="font-size:12px">申请区域：南昌市·青山湖区</div>
+          <div class="al-steps" data-active="4" style="margin-top:10px">
+            <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+          </div>
+          <div class="al-status" style="margin-top:4px"><div class="al-st-title" style="font-size:12px">工程装修中</div><div class="al-st-sub">景顿施工工单已创建，装修完成后回传验收</div></div>
+        </div>
+        <!-- 完成 -->
+        <div class="pd-card">
+          <div class="al-region" style="font-size:12px">申请区域：南昌市·青山湖区</div>
+          <div class="al-steps" data-active="5" style="margin-top:10px">
+            <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+            <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+          </div>
+          <div class="al-status al-status-done" style="margin-top:4px"><div class="al-st-title" style="font-size:12px;color:#1d7a4f">🎉 门店已成功上线</div><div class="al-st-sub">迁址完成，新址已同步地图 POI</div></div>
+        </div>
       </div>
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-        <div class="al g" style="margin-top:6px;font-size:10px">全部通过</div>
-        <div class="arrw g t16"></div>
-        <div class="node nd-teal" style="min-width:130px"><div class="lb" style="font-size:12px">打高端店标</div></div>
-        <div class="arrw t10"></div>
-        
-<div class="node nd-slate" style="min-width:130px;padding:8px 10px"><div class="lb">工程审核</div></div>
-<div class="arrw t10"></div>
-<div class="node nd-teal" style="min-width:130px;padding:8px 10px"><div class="lb">签约</div></div>
-<div class="eb" onclick="tog(this,'combined_acc_sg')"><span>▶</span> 运管 · 政策 · 法务</div>
-<div class="ex" id="combined_acc_sg">
-  <div style="font-size:11px;color:var(--ts);margin-bottom:8px;font-weight:600;text-align:center">签约 · 三方同步审核</div>
-  <div class="sg">
-    <div class="sc" style="background:#fdeef4;border-color:#f0a8c8"><div class="sh" style="color:#c84878">运管</div><div class="ss" style="color:#a06070">租赁合同</div><div class="st" style="color:#c84878;border:1px solid #f0a8c8">三方协议</div></div>
-    <div class="sc" style="background:#eef0fe;border-color:#b8c2f8"><div class="sh" style="color:#4f63e8">政策</div><div class="ss" style="color:#4a5ab0">合规审核</div></div>
-    <div class="sc" style="background:#fdf5e0;border-color:#e8d080"><div class="sh" style="color:#b08830">法务</div><div class="ss" style="color:#8a6820">加盟合同</div><div class="st" style="color:#b08830;border:1px solid #e8d080">补充协议</div></div>
+      <p class="pd-modal-note" style="margin-top:14px;color:#888">完整分步交互可在「交互演示」标签查看。</p>
+    </div>
   </div>
 </div>
-<div class="arrw t10"></div>
-<div class="node nd-slate" style="min-width:130px;padding:8px 10px"><div class="lb">工程装修</div></div>
-<div class="arrw t10"></div>
-<div class="node nd-slate" style="min-width:130px;padding:8px 10px"><div class="lb">上线申请</div></div>
-<div class="arrw t10 g"></div>
-<div class="node nd-slate pill" style="min-width:130px;padding:8px 10px"><div class="lb">门店上线</div></div>
+<style>
+.pd-modal { background:#fff; border-radius:14px; width:680px; max-width:94vw; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; animation:pop .16s ease; }
+.pd-modal-head { padding:14px 18px; border-bottom:0.5px solid #eee; display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; }
+.pd-close { background:none; border:none; font-size:20px; color:#999; cursor:pointer; }
+.pd-modal-body { padding:16px 18px; overflow-y:auto; }
+.pd-modal-note { font-size:12px; color:#666; line-height:1.6; margin-bottom:14px; }
+.pd-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.pd-card { background:#fafafb; border:0.5px solid #eee; border-radius:10px; padding:12px; }
+.t2-progress-cta { margin:12px 16px 0; font-size:12px; color:#534AB7; font-weight:500; cursor:pointer; text-align:center; padding:9px; border:0.5px dashed #9e98e0; border-radius:8px; }
+.t2-progress-cta:hover { background:#faf9ff; }
+@media (max-width:600px){ .pd-cards{ grid-template-columns:1fr; } }
+</style>
+
+<!-- 升降级费用提示 Modal（填写新址提交时弹出） -->
+<div class="overlay" id="feeModalOverlay">
+  <div class="work-modal" onclick="event.stopPropagation()" style="width:330px">
+    <div class="wm-header">
+      <div class="wm-title">门店等级变化提示</div>
+    </div>
+    <div class="wm-body">
+      <div class="fee-modal-icon">⚠️</div>
+      <div class="fee-modal-lead">
+        根据您填写的新址信息，门店等级由 <b>B 类</b> 降级为 <b style="color:#c0392b">C 类</b>，对应费用调整如下：
       </div>
+      <div class="fee-modal-card">
+        <div class="fee-modal-kv"><span>刊例价加盟费</span><b>首年6万 / 第2-8年5万　→　<span style="color:#c0392b">每年 3 万</span></b></div>
+        <div class="fee-modal-kv"><span>管理费</span><b>8,000 元/月　→　8,000 元/月（不变）</b></div>
+      </div>
+      <label class="fee-modal-check"><input type="checkbox" id="feeAckChk" onchange="document.getElementById('feeAckBtn').disabled=!this.checked"> 我已知悉以上费用变化并同意</label>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-primary" id="feeAckBtn" disabled onclick="ackFeeAndContinue()">知悉并提交</button>
     </div>
   </div>
 </div>
+<style>
+.fee-modal-icon { font-size:38px; text-align:center; margin:6px 0 12px; }
+.fee-modal-lead { font-size:13px; color:#444; line-height:1.7; margin-bottom:14px; }
+.fee-modal-card { background:#FFF8E8; border:0.5px solid #e8c84a; border-radius:9px; padding:12px 13px; margin-bottom:14px; }
+.fee-modal-kv { font-size:12px; padding:5px 0; line-height:1.6; }
+.fee-modal-kv span { color:#999; display:block; font-size:11px; }
+.fee-modal-kv b { color:#333; font-weight:500; }
+.fee-modal-check { display:flex; align-items:center; gap:8px; font-size:12px; color:#92660a; cursor:pointer; }
+.fee-modal-check input { width:16px; height:16px; }
+</style>
+
+<!-- App Modal -->
+<div class="overlay" id="appOverlay" onclick="closeAppModal()">
+  <div class="app-modal" onclick="event.stopPropagation()">
+    <div class="mock-sb"><span class="time">12:00</span><span class="icons">▲ ❶ ▊</span></div>
+    <div class="mock-nav"><span class="back">‹</span><span class="title">我的应用</span></div>
+    <div class="mock-body">
+      <div class="mock-st">招商加盟</div>
+      <div class="app-grid">
+        <div class="app-item"><div class="app-icon" style="background:#FFF3E8">🏪</div><div class="app-name">我要开店</div></div>
+        <div class="app-item"><div class="app-icon" style="background:#EBF2FF">📄</div><div class="app-name">安装费协议</div></div>
+        <div class="app-item"><div class="app-icon" style="background:#E6FBF4">🔍</div><div class="app-name">查看商圈</div></div>
+        <div class="app-item"><div class="app-icon" style="background:#EEFBF0">📢</div><div class="app-name">我要推荐</div></div>
+        <div class="app-item"><div class="app-icon" style="background:#F2F0FF">💰</div><div class="app-name">门店融资</div></div>
+        <div class="app-item"><div class="app-icon" style="background:#EBF2FF">🔄</div><div class="app-name">门店转让</div></div>
+        <div class="app-item"><div class="app-icon" style="background:#FFF3E8">⚙️</div><div class="app-name">工位增拓</div></div>
+        <div class="app-item hl"><div class="app-icon"><span>📍</span></div><div class="app-name">门店迁址</div></div>
+      </div>
+    </div>
+    <button class="app-close" onclick="closeAppModal()">关闭</button>
+  </div>
+</div>
+
+<!-- 新建店指引 Modal（地图选址距离超 1km） -->
+<div class="overlay" id="newStoreOverlay" onclick="closeNewStoreModal()">
+  <div class="work-modal" onclick="event.stopPropagation()" style="width:340px">
+    <div class="wm-header">
+      <div class="wm-title">无法提交迁址</div>
+      <button class="wm-close" onclick="closeNewStoreModal()">×</button>
+    </div>
+    <div class="wm-body" style="text-align:center">
+      <div style="font-size:40px;margin:10px 0">📍</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px;color:#c0392b">距离超过 1km，请走新建店流程</div>
+      <div class="ph-noopen-tip">
+        您所选新址与原门店直线距离已超过 1km，超出迁址范围，无法以「迁址」提交，请改走「新建店」流程。
+      </div>
+      <div class="ph-newstore-guide">
+        <div class="ph-newstore-title">🏪 新建店流程步骤</div>
+        <ol class="ph-newstore-steps">
+          <li>进入蓝虎 App，切换成门店</li>
+          <li>点击「全部」，进入招商加盟</li>
+          <li>点击「我要开店」发起新建店申请</li>
+          <li>签署意向书 → 提交选址 → 合同签约 → 工程装修 → 上线</li>
+        </ol>
+      </div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeNewStoreModal()">重新选址</button>
+      <button class="wm-btn wm-primary" onclick="closeNewStoreModal()">前往新建店</button>
+    </div>
+  </div>
+</div>
+
+<!-- 运管驳回示例 Modal（主交互工位变更步骤） -->
+<div class="overlay" id="rejectExampleOverlay" onclick="closeRejectExample()">
+  <div class="work-modal" onclick="event.stopPropagation()" style="width:340px">
+    <div class="wm-header">
+      <div class="wm-title">驳回示例 · 运管工位布局变更</div>
+      <button class="wm-close" onclick="closeRejectExample()">×</button>
+    </div>
+    <div class="wm-body">
+      <div class="al-card" style="border:none;box-shadow:none;padding:0">
+        <div class="al-steps" data-active="1" style="margin-bottom:14px">
+          <div class="al-step"><span class="al-dot"></span><label>发起申请</label></div>
+          <div class="al-step"><span class="al-dot"></span><label>选址审核</label></div>
+          <div class="al-step"><span class="al-dot"></span><label>合同签署</label></div>
+          <div class="al-step"><span class="al-dot"></span><label>工程装修</label></div>
+          <div class="al-step"><span class="al-dot"></span><label>上线前审批</label></div>
+          <div class="al-step"><span class="al-dot"></span><label>迁址完成</label></div>
+        </div>
+        <div class="al-status al-status-reject">
+          <div class="al-st-title" style="color:#c0392b">工位布局变更已驳回</div>
+          <div class="al-st-sub">运管审核未通过，请根据意见调整后重新提交</div>
+        </div>
+      </div>
+      <div class="ph-appr-list" style="margin-top:12px">
+        <div class="ph-appr-node"><span class="ph-appr-dot reject">✕</span><div class="ph-appr-info"><div class="ph-appr-role">运管 · 工位布局变更审核</div><div class="ph-appr-time">驳回原因：工位配置不符合区域要求</div></div><span class="ph-appr-badge reject">已驳回</span></div>
+      </div>
+      <div class="reject-flow-tip">↩ 驳回后退回至「填写场地可行性报告」，加盟商调整后重新提交，已填信息全部保留</div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeRejectExample()">关闭</button>
+    </div>
+  </div>
+</div>
+<style>
+/* 地图选址 */
+.ph-map-select { margin-top:2px; }
+.ph-map-canvas { position:relative; height:150px; border-radius:10px; border:0.5px solid #d8e0ec; overflow:hidden; cursor:crosshair;
+  background:
+    linear-gradient(0deg, rgba(220,232,245,.5) 1px, transparent 1px) 0 0 / 100% 25px,
+    linear-gradient(90deg, rgba(220,232,245,.5) 1px, transparent 1px) 0 0 / 25px 100%,
+    linear-gradient(135deg, #eef4fb, #e4eef7);
+}
+.ph-map-origin { position:absolute; left:15%; top:75%; transform:translate(-50%,-50%); font-size:10px; color:#1a56db; font-weight:600; background:#fff; padding:2px 6px; border-radius:10px; border:0.5px solid #1a56db; white-space:nowrap; }
+.ph-map-pin { position:absolute; transform:translate(-50%,-100%); font-size:22px; pointer-events:none; filter:drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+.ph-map-hint { position:absolute; left:50%; bottom:6px; transform:translateX(-50%); font-size:9px; color:#8aa; background:rgba(255,255,255,.8); padding:2px 8px; border-radius:8px; white-space:nowrap; }
+.ph-map-dist { margin-top:8px; font-size:11px; color:#1d7a4f; background:#EAF6EF; border-radius:7px; padding:7px 10px; }
+.ph-map-dist.over { color:#c0392b; background:#FCEBEB; }
+/* 新建店指引 */
+.ph-newstore-guide { background:#EEF4FF; border:0.5px solid #9db8e8; border-radius:8px; padding:12px 14px; text-align:left; margin-top:6px; }
+.ph-newstore-title { font-size:13px; font-weight:600; color:#3257a8; margin-bottom:8px; }
+.ph-newstore-steps { margin:0; padding-left:18px; font-size:12px; color:#444; line-height:1.9; }
+/* 工位变更步骤里的驳回示例链接 */
+.reject-demo-link { font-size:12px; color:#c0392b; text-align:center; margin-top:14px; padding:8px; border:0.5px dashed #e3a8a8; border-radius:8px; cursor:pointer; }
+.reject-demo-link:hover { background:#fdf0f0; }
+</style>
+
+<!-- 走新开指引 Modal -->
+<div class="overlay" id="newopenOverlay" onclick="closeNewopenModal()">
+  <div class="work-modal" onclick="event.stopPropagation()" style="width:340px">
+    <div class="wm-header">
+      <div class="wm-title">无法提报迁址</div>
+      <button class="wm-close" onclick="closeNewopenModal()">×</button>
+    </div>
+    <div class="wm-body" style="text-align:center">
+      <div style="font-size:40px;margin:10px 0">⛔</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px">当前不满足迁址底线要求</div>
+      <div class="ph-noopen-reasons">
+        <div class="ph-noopen-item"><span>✕</span> 洗美工位为 0，不满足迁址条件</div>
+        <div class="ph-noopen-item"><span>✕</span> 新老址直线距离 &gt; 1km，超出迁址范围</div>
+      </div>
+      <div class="ph-noopen-tip">
+        以上情况无法以「迁址」提报，建议改走「新开门店」流程。
+      </div>
+      <div class="ph-noopen-guide">
+        <div class="ph-noopen-guide-title">📍 走新开指引</div>
+        <div class="ph-noopen-guide-step">蓝虎 App → 我的应用 → 招商加盟 → <b>我要开店</b></div>
+      </div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeNewopenModal()">关闭</button>
+      <button class="wm-btn wm-primary" onclick="closeNewopenModal()">前往新开门店</button>
+    </div>
+  </div>
+</div>
+<style>
+.ph-noopen-reasons { background:#FCEBEB; border-radius:8px; padding:12px 14px; text-align:left; margin-bottom:12px; }
+.ph-noopen-item { font-size:12px; color:#a3372d; line-height:2; }
+.ph-noopen-item span { font-weight:700; margin-right:4px; }
+.ph-noopen-tip { font-size:12px; color:#555; line-height:1.6; margin-bottom:14px; }
+.ph-noopen-guide { background:#EEF4FF; border:0.5px solid #9db8e8; border-radius:8px; padding:12px 14px; text-align:left; }
+.ph-noopen-guide-title { font-size:13px; font-weight:600; color:#3257a8; margin-bottom:6px; }
+.ph-noopen-guide-step { font-size:12px; color:#444; line-height:1.6; }
+</style>
+
+<!-- 工位变更 Modal -->
+<div class="overlay" id="workOverlay" onclick="closeWorkModal()">
+  <div class="work-modal" onclick="event.stopPropagation()">
+    <div class="wm-header">
+      <div class="wm-title">工位布局变更合理性审批</div>
+      <button class="wm-close" onclick="closeWorkModal()">×</button>
+    </div>
+    <div class="wm-body">
+      <div class="wm-st">基础信息</div>
+      <div class="wm-row">
+        <div class="wm-field"><div class="wm-label">门店ID</div><div class="wm-val">89568</div></div>
+        <div class="wm-field"><div class="wm-label">门店名称</div><div class="wm-val" style="font-size:11px">途虎养车工场店（南昌城南大道店）</div></div>
+      </div>
+      <div class="wm-label" style="margin-bottom:4px">工位变更原因（加盟商 / 督导填写）【待定】</div>
+      <div class="wm-textarea">门店迁址，门店原址房租较高且考虑经营成本问题，进行迁址与隔壁，其中涉及到工位减少，故申请。摄像头会按照老店重新布置，无修改。</div>
+
+      <div class="wm-st" style="margin-top:12px">变更前后对比</div>
+      <div class="wm-table-wrap">
+        <table class="wm-table">
+          <thead><tr><th>字段</th><th>变更前</th><th>变更后</th></tr></thead>
+          <tbody>
+            <tr><td>签约面积（㎡）</td><td>372</td><td class="td-chg">317</td></tr>
+            <tr><td>门店规模 A/B/C</td><td>B</td><td>B</td></tr>
+            <tr class="tr-grp"><td colspan="3">工位数量</td></tr>
+            <tr><td class="td-in">机修工位</td><td>5</td><td class="td-chg">4</td></tr>
+            <tr><td class="td-in">四轮定位工位</td><td>1</td><td>1</td></tr>
+            <tr><td class="td-in">美容工位</td><td>1</td><td class="td-chg">0</td></tr>
+            <tr><td class="td-in">洗美工位</td><td>2</td><td>2</td></tr>
+            <tr><td class="td-in">烤漆房数量</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">新能源工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">钣金工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">贴膜工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">其他工位</td><td>0</td><td>0</td></tr>
+            <tr><td>门店租金（元/月）</td><td>26,536</td><td class="td-chg">17,435</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="wm-st" style="margin-top:12px">审核链路</div>
+      <div class="wm-approvers">
+        <div class="wm-approver"><div class="wm-ar">督导</div><div class="wm-as">审核中</div></div>
+        <div class="wm-arrow-sep">→</div>
+        <div class="wm-approver"><div class="wm-ar">运管</div><div class="wm-as">待审核</div></div>
+        <div class="wm-arrow-sep">→</div>
+        <div class="wm-approver"><div class="wm-ar">战区</div><div class="wm-as">待审核</div></div>
+      </div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeWorkModal()">关闭</button>
+      <button class="wm-btn wm-primary" onclick="closeWorkModal()">提交审批</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新址填写 Modal -->
+<div class="overlay" id="newAddrOverlay" onclick="closeNewAddrModal()">
+  <div class="work-modal" onclick="event.stopPropagation()">
+    <div class="wm-header">
+      <div class="wm-title">填写新址工位信息</div>
+      <button class="wm-close" onclick="closeNewAddrModal()">×</button>
+    </div>
+    <div class="wm-body">
+      <div class="na-legend">
+        <span class="na-tag-old">老店信息 · 系统自动带出</span>
+        <span class="na-tag-new">新址信息 · 待填写</span>
+      </div>
+
+      <div class="wm-st" style="margin-top:4px">门店信息对照</div>
+      <table class="na-table">
+        <thead><tr><th>字段</th><th class="th-old">老店（自动带出）</th><th class="th-new">新址（待填写）</th></tr></thead>
+        <tbody>
+          <tr><td>门店等级</td><td class="td-old">B</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td>签约面积（㎡）</td><td class="td-old">372</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td>门店租金（元/月）</td><td class="td-old">26,536</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr class="tr-grp"><td colspan="3">工位数量</td></tr>
+          <tr><td class="td-in">机修工位</td><td class="td-old">5</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">四轮定位工位</td><td class="td-old">1</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">美容工位</td><td class="td-old">1</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">洗美工位</td><td class="td-old">2</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">烤漆房数量</td><td class="td-old">0</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">新能源工位</td><td class="td-old">0</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">钣金工位</td><td class="td-old">0</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">贴膜工位</td><td class="td-old">0</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+          <tr><td class="td-in">其他工位</td><td class="td-old">0</td><td class="td-new"><span class="na-input">待填写</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="wm-st" style="margin-top:14px;display:flex;align-items:center;gap:6px;">
+        填写须知
+        <span class="na-tip">?
+          <span class="na-tip-text">提交时校验底线要求：洗美工位 ≥ 1 · 下沉 3+1 需收紧 · 门头 12 米以上面积 150 要求大田字格或前三后一 · 等（不满足则无法提交）</span>
+        </span>
+      </div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeNewAddrModal()">关闭</button>
+      <button class="wm-btn wm-primary" onclick="closeNewAddrModal()">提交</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.na-legend { display:flex; gap:10px; margin-bottom:10px; }
+.na-tag-old, .na-tag-new { font-size:10px; padding:3px 9px; border-radius:4px; }
+.na-tag-old { background:#F1EFE8; color:#5F5E5A; border:0.5px solid #c8c6bc; }
+.na-tag-new { background:#EEEDFE; color:#3C3489; border:0.5px solid #534AB7; }
+.na-table { width:100%; border-collapse:collapse; font-size:12px; }
+.na-table th { padding:6px 10px; text-align:center; font-weight:500; font-size:11px; border:0.5px solid #e0ddd6; }
+.na-table th.th-old { background:#f5f4f0; color:#666; }
+.na-table th.th-new { background:#EEEDFE; color:#3C3489; }
+.na-table td { padding:5px 10px; text-align:center; border:0.5px solid #e0ddd6; }
+.na-table td:first-child { text-align:left; color:#444; }
+.na-table .td-in { padding-left:18px !important; color:#666; }
+.na-table .td-old { background:#faf9f6; color:#555; }
+.na-table .td-new { background:#faf9ff; }
+.na-table .tr-grp td { background:#f9f8f5; font-size:10px; color:#888; font-weight:500; text-align:left; }
+.na-input { font-size:11px; color:#9e98e0; font-style:italic; }
+.na-addr-field { background:#faf9ff; border:0.5px dashed #9e98e0; border-radius:6px; padding:9px 12px; }
+.na-tip {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:14px; height:14px; border-radius:50%;
+  background:#c8c6bc; color:#fff; font-size:9px; font-weight:600;
+  cursor:help; position:relative; font-style:normal; letter-spacing:0;
+}
+.na-tip .na-tip-text {
+  display:none; position:absolute; top:130%; left:0;
+  width:240px; background:#2c2c2a; color:#fff;
+  font-size:10px; font-weight:400; line-height:1.6; letter-spacing:0;
+  padding:8px 10px; border-radius:6px; z-index:10;
+  text-transform:none; text-align:left;
+}
+.na-tip:hover .na-tip-text { display:block; }
+.na-tip .na-tip-text::after {
+  content:''; position:absolute; bottom:100%; left:14px;
+  border:5px solid transparent; border-bottom-color:#2c2c2a;
+}
+</style>
+
+<!-- 升降级 Modal -->
+<div class="overlay" id="downgradeOverlay" onclick="closeDowngradeModal()">
+  <div class="work-modal" onclick="event.stopPropagation()">
+    <div class="wm-header">
+      <div class="wm-title">工位布局变更合理性审批 · 降级申请</div>
+      <button class="wm-close" onclick="closeDowngradeModal()">×</button>
+    </div>
+    <div class="wm-body">
+      <div class="wm-st">基础信息</div>
+      <div class="wm-row">
+        <div class="wm-field"><div class="wm-label">门店ID</div><div class="wm-val">74503</div></div>
+        <div class="wm-field"><div class="wm-label">门店类型</div><div class="wm-val">B</div></div>
+      </div>
+      <div class="wm-row">
+        <div class="wm-field"><div class="wm-label">门店名称</div><div class="wm-val" style="font-size:11px">途虎养车工场店（东莞石龙西湖金沙湾店）</div></div>
+      </div>
+      <div class="wm-row">
+        <div class="wm-field"><div class="wm-label">加盟商</div><div class="wm-val">洪浩</div></div>
+        <div class="wm-field"><div class="wm-label">降级日期</div><div class="wm-val">2026-05-25</div></div>
+      </div>
+
+      <div class="wm-label" style="margin-bottom:4px">降级原因（加盟商 / 督导填写）</div>
+      <div class="wm-textarea">门店实际盈利情况不佳，大部分月份处于亏损状态，且按实际经营成本计算全年门店属于亏损状态。加盟商原本计划闭一开一，经沟通后加盟商选择不闭店且新开一家，为使门店持续经营，现需递增 10%，现沟通要应房租不递增，维持原房租留在商铺继续经营，且因场地经营面积小，申请减少 2 个轮保工位。现申请 6 月续加盟费时降为 C 类门店。</div>
+
+      <div class="wm-st" style="margin-top:12px">费用变化</div>
+      <div class="wm-table-wrap">
+        <table class="wm-table">
+          <thead><tr><th>项目</th><th>降级前（B 类）</th><th>降级后（C 类）</th></tr></thead>
+          <tbody>
+            <tr><td>刊例价加盟费</td><td>首年 6 万 / 第 2-8 年 5 万</td><td class="td-chg">每年 3 万</td></tr>
+            <tr><td>管理费</td><td>8,000 元/月</td><td>8,000 元/月</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="wm-hint" style="margin-bottom:12px">是否涉及升降级：<b style="color:#c0392b">降级</b> · 若是计算加盟费补收金额：否，降级不退费</div>
+
+      <div class="wm-st">降级前后对比</div>
+      <div class="wm-table-wrap">
+        <table class="wm-table">
+          <thead><tr><th>字段</th><th>变更前</th><th>变更后</th></tr></thead>
+          <tbody>
+            <tr><td>工位总数</td><td>6</td><td class="td-chg">4</td></tr>
+            <tr class="tr-grp"><td colspan="3">工位数量</td></tr>
+            <tr><td class="td-in">机修工位</td><td>4</td><td class="td-chg">2</td></tr>
+            <tr><td class="td-in">四轮定位工位</td><td>1</td><td>1</td></tr>
+            <tr><td class="td-in">洗美工位（洗车）</td><td>1</td><td>1</td></tr>
+            <tr><td class="td-in">美容工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">烤漆房</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">钣金工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">新能源工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">摩托车工位</td><td>0</td><td>0</td></tr>
+            <tr><td class="td-in">其他工位</td><td>0</td><td>0</td></tr>
+            <tr><td>门店面积（㎡）</td><td>235.3</td><td>235.3</td></tr>
+            <tr><td>门店租金（元/月）</td><td>15,500</td><td>15,500</td></tr>
+            <tr><td>门店等级</td><td>B</td><td class="td-chg">C</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="wm-st" style="margin-top:12px">审核链路（升降级）</div>
+      <div class="wm-approvers" style="flex-wrap:wrap;gap:6px 4px;">
+        <div class="wm-approver"><div class="wm-ar">运管</div><div class="wm-as">审核中</div></div>
+        <div class="wm-arrow-sep">→</div>
+        <div class="wm-approver"><div class="wm-ar">战区</div><div class="wm-as">待审核</div></div>
+        <div class="wm-arrow-sep">→</div>
+        <div class="wm-approver"><div class="wm-ar">BDM</div><div class="wm-as">待审核</div></div>
+      </div>
+      <div class="wm-approvers" style="margin-top:6px;">
+        <div class="wm-approver"><div class="wm-ar">新 / 老商负责人</div><div class="wm-as">待审核</div></div>
+        <div class="wm-arrow-sep">→</div>
+        <div class="wm-approver"><div class="wm-ar">Apple</div><div class="wm-as">待审核</div></div>
+      </div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeDowngradeModal()">关闭</button>
+      <button class="wm-btn wm-primary" onclick="closeDowngradeModal()">提交审批</button>
+    </div>
+  </div>
+</div>
+
+<!-- 运管审批结果回填 Modal -->
+<div class="overlay" id="workResultOverlay" onclick="closeWorkResultModal()">
+  <div class="work-modal" onclick="event.stopPropagation()" style="width:360px">
+    <div class="wm-header">
+      <div class="wm-title">工位变更 · 运管审批结果回填</div>
+      <button class="wm-close" onclick="closeWorkResultModal()">×</button>
+    </div>
+    <div class="wm-body">
+      <div class="rf-note">
+        工位变更审批由运管在线下（邮件）完成，时效较长。系统在此保留节点，由运管将<b>最终审批结果回填</b>，无论同意或驳回均<b>留痕可追溯</b>。
+      </div>
+
+      <div class="wm-st">回填审批结果</div>
+      <div class="rf-result-card rf-pass">
+        <div class="rf-result-head"><span class="rf-tag rf-tag-pass">同意</span>运管审批通过</div>
+        <div class="rf-kv"><span>审批人</span><b>方园瑶（运管）</b></div>
+        <div class="rf-kv"><span>回填时间</span><b>2026-06-18 14:26</b></div>
+        <div class="rf-kv"><span>邮件凭证</span><b class="rf-link">📎 工位变更审批邮件.eml</b></div>
+        <div class="rf-kv"><span>审批意见</span><b>同意本次工位变更，可继续后续流程</b></div>
+      </div>
+      <div class="rf-flow-note rf-flow-pass">→ 同意：流程继续，进入选址</div>
+
+      <div class="wm-st" style="margin-top:16px">若驳回（示例）</div>
+      <div class="rf-result-card rf-reject">
+        <div class="rf-result-head"><span class="rf-tag rf-tag-reject">驳回</span>运管审批驳回</div>
+        <div class="rf-kv"><span>驳回原因</span><b>工位配置不符合区域要求，需调整后重新提报</b></div>
+      </div>
+      <div class="rf-flow-note rf-flow-reject">→ 驳回：留痕并退回加盟商重新填写新址信息</div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeWorkResultModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 升降级审批结果回填 Modal -->
+<div class="overlay" id="upgradeResultOverlay" onclick="closeUpgradeResultModal()">
+  <div class="work-modal" onclick="event.stopPropagation()" style="width:360px">
+    <div class="wm-header">
+      <div class="wm-title">升降级 · 人工节点结果回填</div>
+      <button class="wm-close" onclick="closeUpgradeResultModal()">×</button>
+    </div>
+    <div class="wm-body">
+      <div class="rf-note">
+        升降级审批（BDM · 运管 · 战区 → 新/老商负责人 → Apple）在线下完成。系统保留人工节点，由专人将最终结果回填，点击<b>通过 / 驳回</b>让流程继续，并<b>留痕可追溯</b>。
+      </div>
+
+      <div class="wm-st">回填审批结果</div>
+      <div class="rf-result-card rf-pass">
+        <div class="rf-result-head"><span class="rf-tag rf-tag-pass">通过</span>升降级审批通过</div>
+        <div class="rf-kv"><span>处理人</span><b>Apple</b></div>
+        <div class="rf-kv"><span>回填时间</span><b>2026-06-19 10:30</b></div>
+        <div class="rf-kv"><span>邮件凭证</span><b class="rf-link">📎 降级申请审批邮件.eml</b></div>
+        <div class="rf-kv"><span>结论</span><b>同意降级为 C 类门店</b></div>
+      </div>
+      <div class="rf-btn-row">
+        <button class="rf-btn rf-btn-pass">✓ 通过 → 流程继续</button>
+        <button class="rf-btn rf-btn-reject">✕ 驳回 → 退回重填</button>
+      </div>
+      <div class="rf-flow-note rf-flow-reject" style="margin-top:12px">→ 驳回：留痕并退回加盟商重新填写新址信息</div>
+    </div>
+    <div class="wm-footer">
+      <button class="wm-btn wm-ghost" onclick="closeUpgradeResultModal()">关闭</button>
+    </div>
+  </div>
+</div>
+<style>
+.rf-note { font-size:11px; color:#555; line-height:1.7; background:#f7f6f3; border-radius:8px; padding:10px 12px; margin-bottom:14px; }
+.rf-result-card { border-radius:8px; padding:11px 13px; }
+.rf-pass { background:#EAF6EF; border:0.5px solid #9ed3b5; }
+.rf-reject { background:#FCEBEB; border:0.5px solid #e3a8a8; }
+.rf-result-head { font-size:13px; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.rf-tag { font-size:10px; padding:1px 8px; border-radius:10px; }
+.rf-tag-pass { background:#1d9e75; color:#fff; }
+.rf-tag-reject { background:#c0392b; color:#fff; }
+.rf-kv { display:flex; font-size:11px; padding:3px 0; line-height:1.5; }
+.rf-kv span { color:#999; width:64px; flex-shrink:0; }
+.rf-kv b { color:#333; font-weight:500; flex:1; }
+.rf-link { color:#1a56db !important; }
+.rf-flow-note { font-size:11px; margin-top:8px; padding:6px 10px; border-radius:6px; }
+.rf-flow-pass { color:#1d7a4f; background:#e3f5ea; }
+.rf-flow-reject { color:#c0392b; background:#fae6e6; }
+.rf-btn-row { display:flex; gap:8px; margin-top:12px; }
+.rf-btn { flex:1; padding:9px; border-radius:7px; font-size:12px; font-weight:500; cursor:pointer; border:0.5px solid; }
+.rf-btn-pass { background:#1d9e75; color:#fff; border-color:#1d9e75; }
+.rf-btn-reject { background:#fff; color:#c0392b; border-color:#c0392b; }
+</style>
+
 <script>
-function sw(t){['combined','offline'].forEach(p=>{const e=document.getElementById('panel-'+p);if(e)e.classList.remove('show');});document.getElementById('panel-'+t).classList.add('show');document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('ac','ao2'));if(t==='combined')document.querySelector('.tab:first-child').classList.add('ac');else document.getElementById('tab-offline').classList.add('ao2');}
-function tog(btn,id){const b=document.getElementById(id);if(!b)return;const o=b.classList.toggle('show');btn.querySelector('span').textContent=o?'▼':'▶';btn.classList.toggle('op',o);}
-</script>
+function openAppModal()  { document.getElementById('appOverlay').classList.add('open'); }
+function closeAppModal() { document.getElementById('appOverlay').classList.remove('open'); }
+function openWorkModal()  { document.getElementById('workOverlay').classList.add('open'); }
+function closeWorkModal() { document.getElementById('workOverlay').classList.remove('open'); }
+function openDowngradeModal()  { document.getElementById('downgradeOverlay').classList.add('open'); }
+function closeDowngradeModal() { document.getElementById('downgradeOverlay').classList.remove('open'); }
+function openNewAddrModal()  { document.getElementById('newAddrOverlay').classList.add('open'); }
+function closeNewAddrModal() { document.getElementById('newAddrOverlay').classList.remove('open'); }
+function openNewopenModal()  { document.getElementById('newopenOverlay').classList.add('open'); }
+function closeNewopenModal() { document.getElementById('newopenOverlay').classList.remove('open'); }
+function openWorkResultModal()  { document.getElementById('workResultOverlay').classList.add('open'); }
+function closeWorkResultModal() { document.getElementById('workResultOverlay').classList.remove('open'); }
+function openUpgradeResultModal()  { document.getElementById('upgradeResultOverlay').classList.add('open'); }
+function closeUpgradeResultModal() { document.getElementById('upgradeResultOverlay').classList.remove('open'); }
 
+function switchTab(e, id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  e.currentTarget.classList.add('active');
+}
 
-<div class="panel" id="panel-offline">
-  <div style="max-width:900px;margin:0 auto;">
+/* ── App 向导逻辑 ── */
+var phStep = 0;
+var phMax = 13;
+var phMeta = [
+  { title:'我的应用',     next:'',         showBack:false },
+  { title:'申请列表',     next:'发起申请',   showBack:false },
+  { title:'填写场地报告',  next:'提交报告',   showBack:true  },
+  { title:'申请列表',     next:'查看下一步', showBack:false },
+  { title:'申请列表',     next:'确认采纳',   showBack:false },
+  { title:'申请列表',     next:'查看下一步', showBack:false },
+  { title:'申请列表',     next:'查看下一步', showBack:false },
+  { title:'申请列表',     next:'确认合同',   showBack:false },
+  { title:'上传合同材料',  next:'提交材料',   showBack:true  },
+  { title:'申请列表',     next:'实名认证',   showBack:false },
+  { title:'申请列表',     next:'查看下一步', showBack:false },
+  { title:'申请列表',     next:'查看下一步', showBack:false },
+  { title:'申请列表',     next:'查看下一步', showBack:false },
+  { title:'申请列表',     next:'完成',      showBack:false }
+];
 
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-      <div style="width:4px;height:24px;background:#6d4aad;border-radius:2px;flex-shrink:0;"></div>
-      <div>
-        <div style="font-size:16px;font-weight:600;color:var(--text);">线下邮件审核链路</div>
-        <div style="font-size:12px;color:var(--ts);margin-top:2px;">线上化前适用 · 新/老商均适用</div>
-      </div>
-      <div style="margin-left:auto;background:#f3eeff;border:1px solid #c4a8f8;border-radius:6px;padding:4px 14px;font-size:12px;color:#6d4aad;font-weight:500;">邮件审批</div>
-    </div>
+function renderStep() {
+  document.querySelectorAll('.ph-step').forEach(s => s.classList.remove('active'));
+  var cur = document.querySelector('.ph-step[data-step="'+phStep+'"]');
+  if (cur) cur.classList.add('active');
 
-    <!-- 两栏布局：左审核链路，右邮件模板 -->
-    <div style="display:flex;gap:20px;align-items:flex-start;">
+  document.getElementById('phTitle').textContent = phMeta[phStep].title;
+  document.getElementById('phProgressBar').style.width = (phStep/phMax*100) + '%';
 
-      <!-- ── 左：审核链路 ── -->
-      <div style="flex:1;min-width:0;">
+  var nextBtn = document.getElementById('phNextBtn');
+  var backBtn = document.getElementById('phBackBtn');
+  var footer  = document.getElementById('phFooter');
 
-        <!-- CC 置顶 -->
-        <div style="margin-bottom:14px;">
-          <div class="eb" onclick="tog(this,'off_cc')"><span>▶</span> 邮件 CC 抄送人员</div>
-          <div class="ex" id="off_cc" style="max-width:100%;">
-            <div style="font-size:11px;font-weight:600;color:var(--ts);margin-bottom:8px;">邮件抄送（CC）</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                  <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">甘泉</span>
-          <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">工程（蔡航、梅洪斌）</span>
-              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">张卫杰（小鱼）</span>
-              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">顿秋平</span>
-              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">张浩31</span>
-              <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">包思婕</span>
-                  <span style="background:#f5f4f1;border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:12px;color:var(--text);">销运（老商：于雪 / 新商：陆小燕）</span>
-            </div>
-          </div>
-        </div>
+  // step0 入口无底部按钮（点图标进入）
+  if (phStep === 0) {
+    footer.style.display = 'none';
+  } else {
+    footer.style.display = 'flex';
+    nextBtn.textContent = phMeta[phStep].next;
+    backBtn.style.display = phMeta[phStep].showBack ? 'block' : 'none';
+  }
+  nextBtn.disabled = false;
 
-        <div style="background:#fff;border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);">
+  document.querySelector('.ph-body').scrollTop = 0;
+}
 
-          <!-- STEP 1 -->
-          <div style="background:#f3eeff;border-bottom:1.5px solid #ddd0f5;padding:13px 20px;display:flex;align-items:center;gap:10px;">
-            <div style="background:#6d4aad;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
-            <div style="font-size:13px;font-weight:600;color:#4a2080;">高端店商资质及点址审批</div>
-          </div>
-          <div style="padding:16px 20px;">
-            <div style="padding-left:12px;">
-              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
-                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-                </div>
-                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">招商</div>
-                      <div style="font-size:12px;color:var(--text);">完成申请字段信息填写</div>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
-                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-                </div>
-                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">BDM</div>
-                      <div style="font-size:12px;color:var(--text);">发起邮件审批流程</div>
-                    </div>
-                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">各自招商的 BDM</div>
-                  </div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
-                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-                </div>
-                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">新/老商负责人</div>
-                      <div style="font-size:12px;color:var(--text);">确认高端店申请</div>
-                    </div>
-                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">刘冬 / 谢甫勇</div>
-                  </div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
-                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-                </div>
-                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">商管理</div>
-                      <div style="font-size:12px;color:var(--text);">确认商资质</div>
-                    </div>
-                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">葛婷</div>
-                  </div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
-                  <div style="width:9px;height:9px;border-radius:50%;background:#c4a8f8;border:2px solid #6d4aad;margin-top:3px;flex-shrink:0;"></div>
-                  <div style="flex:1;width:2px;background:#ddd0f5;margin:3px 0;"></div>
-                </div>
-                <div style="background:#fafafa;border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;flex:1;">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#6d4aad;margin-bottom:1px;">商圈</div>
-                      <div style="font-size:12px;color:var(--text);">确认点址是否符合高端店要求</div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                      <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">侯丹 / 孙景妍 / 茆睿瑶</div>
+function nextStep() {
+  // step2 填写场地报告 → 提交时先校验地图选址距离
+  if (phStep === 2) {
+    if (window._mapDistanceOver) {  // 选址距离超过1km
+      openNewStoreModal();
+      return;
+    }
+    if (!window._feeAcked) {  // 再校验升降级费用确认
+      openFeeModal();
+      return;
+    }
+  }
+  if (phStep < phMax) {
+    phStep++;
+    renderStep();
+  } else {
+    resetWizard();
+  }
+}
+function prevStep() {
+  if (phStep > 0) { phStep--; renderStep(); }
+}
+// 地图选址：点击地图切换近/远，演示距离校验
+function phMapClick(e) {
+  var canvas = document.getElementById('phMapCanvas');
+  var pin = document.getElementById('phMapPin');
+  var dist = document.getElementById('phMapDist');
+  var rect = canvas.getBoundingClientRect();
+  var x = ((e.clientX - rect.left) / rect.width) * 100;
+  var y = ((e.clientY - rect.top) / rect.height) * 100;
+  pin.style.left = x + '%';
+  pin.style.top = y + '%';
+  // 原门店在左下角(15%,75%)，计算到点击点的"距离"（演示用：屏占比×系数）
+  var dx = x - 15, dy = y - 75;
+  var px = Math.sqrt(dx*dx + dy*dy);
+  var km = (px / 100 * 2.2).toFixed(1);  // 映射成 km
+  if (parseFloat(km) > 1) {
+    window._mapDistanceOver = true;
+    dist.innerHTML = '当前选址距原门店：<b style="color:#c0392b">' + km + ' km</b> ✕ 超出可迁址范围';
+    dist.classList.add('over');
+  } else {
+    window._mapDistanceOver = false;
+    dist.innerHTML = '当前选址距原门店：<b>' + km + ' km</b> ✓ 在可迁址范围内';
+    dist.classList.remove('over');
+  }
+}
+// 新建店指引弹窗（距离超1km）
+function openNewStoreModal() { document.getElementById('newStoreOverlay').classList.add('open'); }
+function closeNewStoreModal() { document.getElementById('newStoreOverlay').classList.remove('open'); }
+// 运管驳回示例弹窗
+function openRejectExample() { document.getElementById('rejectExampleOverlay').classList.add('open'); }
+function closeRejectExample() { document.getElementById('rejectExampleOverlay').classList.remove('open'); }
+// 费用提示弹窗（升降级）
+function openFeeModal() { document.getElementById('feeModalOverlay').classList.add('open'); }
+function closeFeeModal() { document.getElementById('feeModalOverlay').classList.remove('open'); }
+function openProgressDemo() { document.getElementById('progressDemoOverlay').classList.add('open'); }
+function closeProgressDemo() { document.getElementById('progressDemoOverlay').classList.remove('open'); }
+function ackFeeAndContinue() {
+  if (!document.getElementById('feeAckChk').checked) return;
+  window._feeAcked = true;
+  closeFeeModal();
+  phStep++;
+  renderStep();
+}
+function resetWizard() {
+  phStep = 0;
+  window._feeAcked = false;
+  window._mapDistanceOver = false;
+  var ack = document.getElementById('feeAckChk');
+  if (ack) ack.checked = false;
+  renderStep();
+}
+// 初始化
+renderStep();
 
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:stretch;gap:0;margin-bottom:8px;">
-                <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;">
-                  <div style="width:9px;height:9px;border-radius:50%;background:#6d4aad;border:2px solid #4a2080;margin-top:3px;flex-shrink:0;"></div>
-                  
-                </div>
-                <div style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:7px;padding:9px 12px;flex:1;">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:5px;">
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#4a2080;margin-bottom:1px;">发管负责人</div>
-                      <div style="font-size:12px;color:var(--text);">终审 ✓</div>
-                    </div>
-                    <div style="font-size:10px;color:var(--ts);background:#f5f4f1;border:1px solid var(--bdr);border-radius:4px;padding:2px 7px;white-space:nowrap;">方露瑶</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style="border-top:1.5px dashed #e0d8f0;margin:0 20px;"></div>
-
-          <!-- STEP 2 -->
-          <div style="padding:14px 20px;">
-            <div style="display:flex;align-items:flex-start;gap:10px;">
-              <div style="background:#6d4aad;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
-              <div style="flex:1;">
-                <div style="font-size:13px;font-weight:600;color:#4a2080;margin-bottom:10px;">合同审核与归档（三方并行）</div>
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                  <div style="background:#fdeef4;border:1.5px solid #f0a8c8;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
-                    <div style="font-size:12px;font-weight:600;color:#c84878;white-space:nowrap;">@ 李鸿芸</div>
-                    <div style="font-size:12px;color:#a06070;">审核并回收归档租赁合同的<span style="font-weight:600;color:#c84878;margin-left:4px;">三方协议</span></div>
-                  </div>
-                  <div style="background:#fdf5e0;border:1.5px solid #e8d080;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
-                    <div style="font-size:12px;font-weight:600;color:#b08830;white-space:nowrap;">@ 李刚1</div>
-                    <div style="font-size:12px;color:#8a6820;">审核加盟合同的<span style="font-weight:600;color:#b08830;margin-left:4px;">补充协议</span></div>
-                  </div>
-                  <div style="background:#e8f4fe;border:1.5px solid #a0c8f0;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
-                    <div style="font-size:12px;font-weight:600;color:#2060a0;white-space:nowrap;">@ 张信</div>
-                    <div style="font-size:12px;color:#4a7898;">统筹三方协议 &amp; 加盟补充协议的<span style="font-weight:600;color:#2060a0;margin-left:4px;">回收归档</span></div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-
-        </div>
-      </div>
-
-      <!-- ── 右：邮件模板 ── -->
-      <div style="flex:0 0 380px;min-width:0;">
-        <div style="background:#fff;border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);position:sticky;top:20px;">
-
-          <div style="background:#1a1714;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;">
-            <div style="font-size:13px;font-weight:600;color:#fff;">高端店新建店邮件模板</div>
-            <button onclick="copyEmail()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">复制</button>
-          </div>
-
-          <div id="email-template" style="padding:16px 18px;font-size:12px;line-height:1.8;color:var(--text);background:#fafafa;">
-            <div style="color:var(--ts);margin-bottom:8px;font-size:11px;">各位好：</div>
-            <div style="margin-bottom:8px;">现有加盟商<span style="background:#fff8e0;border-radius:3px;padding:0 3px;border:1px dashed #e8d080;cursor:pointer;" title="点击填写">X</span>计划于<span style="background:#fff8e0;border-radius:3px;padding:0 3px;border:1px dashed #e8d080;cursor:pointer;" title="点击填写">某地</span>新开途虎工场店，申请特批新建高端店</div>
-            <div style="font-weight:600;margin:10px 0 6px;">具体点址信息为：高端店新开门店</div>
-            <div style="background:#f5f4f1;border-radius:6px;padding:10px 12px;margin-bottom:10px;">
-              <div style="margin-bottom:4px;"><span style="color:#6d4aad;font-weight:600;">1)</span> 申请单号：<span style="color:var(--ts);">___________</span></div>
-              <div style="margin-bottom:4px;"><span style="color:#6d4aad;font-weight:600;">2)</span> 具体点址：<span style="color:var(--ts);">___________</span></div>
-              <div><span style="color:#6d4aad;font-weight:600;">3)</span> 场地信息（请尽可能多地提供相关信息）：</div>
-              <div style="color:var(--ts);font-size:11px;margin-top:4px;padding-left:14px;line-height:1.7;">
-                门店出入车辆动线图<br>门头招牌图<br>指引招牌图<br>指引招牌相对位置图（如有）<br>工位布局图
-              </div>
-            </div>
-            <div style="border-top:1px dashed var(--bdr);padding-top:10px;">
-              <div style="color:#6d4aad;font-weight:600;margin-bottom:6px;font-size:11px;">审批节点</div>
-              <div style="display:flex;flex-direction:column;gap:5px;">
-                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@新/老商负责人</span> 确认高端店申请</div>
-                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@商管理</span> 确认商资质</div>
-                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@商圈</span> 确认点址是否符合高端店要求</div>
-                <div style="font-size:11px;color:var(--text);"><span style="color:#4a2080;font-weight:600;">@发管负责人</span> 终审</div>
-                <div style="font-size:11px;color:var(--text);"><span style="color:#c84878;font-weight:600;">@李鸿芸</span> 审核并回收归档租赁合同三方协议</div>
-                <div style="font-size:11px;color:var(--text);"><span style="color:#b08830;font-weight:600;">@李刚1</span> 审核加盟合同的补充协议</div>
-                <div style="font-size:11px;color:var(--text);"><span style="color:#2060a0;font-weight:600;">@张信</span> 统筹三方协议&amp;加盟补充协议的回收归档</div>
-              </div>
-            </div>
-            <div style="border-top:1px dashed var(--bdr);padding-top:10px;margin-top:8px;">
-              <div style="color:#6d4aad;font-weight:600;margin-bottom:6px;font-size:11px;">申请链路节点人</div>
-              <div style="font-size:11px;color:var(--ts);line-height:1.8;">
-                BDM：各自招商的BDM<br>
-                新老商负责人：刘冬/谢甫勇<br>
-                商管理：葛婷<br>
-                商圈：侯丹/孙景妍/茆睿瑶<br>
-                发管负责人：方露瑶
-              </div>
-            </div>
-            <div style="border-top:1px dashed var(--bdr);padding-top:10px;margin-top:8px;">
-              <div style="color:#6d4aad;font-weight:600;margin-bottom:6px;font-size:11px;">邮件CC</div>
-              <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                  <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">甘泉</span>
-                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">工程（蔡航、梅洪斌）</span>
-                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">张卫杰（小鱼）</span>
-                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">顿秋平</span>
-                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">张浩31</span>
-                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">包思婕</span>
-                <span style="background:#f3eeff;border:1px solid #c4a8f8;border-radius:4px;padding:1px 7px;font-size:10px;color:#6d4aad;">销运（老商：于雪/新商：陆小燕）</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<script>
-function copyEmail() {
-  const t = document.getElementById('email-template');
-  const lines = [];
-  lines.push('各位好：');
-  lines.push('');
-  lines.push('现有加盟商X计划于某地新开途虎工场店，申请特批新建高端店');
-  lines.push('');
-  lines.push('具体点址信息为：高端店新开门店');
-  lines.push('1) 申请单号：');
-  lines.push('2) 具体点址：');
-  lines.push('3) 场地信息（请尽可能多地提供相关信息）：门店出入车辆动线图、门头招牌图、指引招牌图、指引招牌相对位置图（如有）、工位布局图');
-  lines.push('');
-  lines.push('@新/老商负责人：确认高端店申请');
-  lines.push('@商管理 ：确认商资质');
-  lines.push('@商圈：确认点址是否符合高端店要求');
-  lines.push('@发管负责人：终审');
-  lines.push('@李鸿芸 审核并回收归档租赁合同三方协议、@李刚1 审核加盟合同的补充协议、@张信 统筹三方协议&加盟补充协议的回收归档');
-  lines.push('');
-  lines.push('申请链路节点人：BDM：各自招商的BDM；新老商负责人：刘冬/谢甫勇；商管理：葛婷；商圈：侯丹/孙景妍/茆睿瑶；发管负责人：方露瑶；');
-  lines.push('邮件CC：甘泉、工程（蔡航、梅洪斌）、张卫杰（小鱼）、顿秋平、张浩31、包思婕、销运（老商：于雪/新商：陆小燕）');
-  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
-    const btn = document.querySelector('button[onclick="copyEmail()"]');
-    const orig = btn.textContent;
-    btn.textContent = '已复制 ✓';
-    btn.style.background = 'rgba(14,140,114,0.3)';
-    setTimeout(()=>{btn.textContent=orig;btn.style.background='rgba(255,255,255,0.12)';}, 2000);
-  });
+function toggleExpand(el) {
+  const content = el.nextElementSibling;
+  const icon = el.querySelector('.expand-icon');
+  const isOpen = content.classList.toggle('open');
+  const map = {
+    '选址':       ['▼ 收起选址流程', '▶ 展开选址流程'],
+    '升降级审批结果回填':  ['▼ 收起升降级审批', '▶ 展开升降级审批'],
+    '签署合同': ['▼ 收起签署流程', '▶ 展开签署流程'],
+    '工程装修':    ['▼ 收起工程流程', '▶ 展开工程流程'],
+    '上线前审批':  ['▼ 收起上线审批流程', '▶ 展开上线审批流程'],
+  };
+  const title = el.querySelector('.node-title').textContent.trim();
+  const pair = map[title] || ['▼ 收起', '▶ 展开'];
+  icon.textContent = isOpen ? pair[0] : pair[1];
 }
 </script>
-
 </body>
 </html>
