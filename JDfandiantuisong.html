@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>翻店预警 · 京东合约到期智能预警 原型 V10.0</title>
+<style>
+/* ========== 基础 ========== */
+:root{
+  --tuhu:#FF6600;--tuhu-deep:#E55A00;
+  --jd:#E1251B;--xmz:#2563EB;--tmall:#9333EA;
+  --warn:#DC2626;
+  --ink:#1F2329;--ink2:#5A616B;--ink3:#8A9099;
+  --line:#E4E7EC;--bg:#F3F4F7;--card:#FFFFFF;--ok:#16A34A;--radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+
+/* ========== 顶栏 ========== */
+.topbar{background:linear-gradient(135deg,#23262B 0%,#2E323A 100%);color:#fff;padding:18px 24px 16px}
+.topbar-inner{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.brand-dot{width:38px;height:38px;border-radius:10px;background:var(--tuhu);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex:none}
+.topbar h1{font-size:19px;font-weight:700;letter-spacing:.02em}
+.topbar .sub{font-size:12px;color:#B7BDC6;margin-top:2px}
+.tier-legend{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.tier-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap;background:var(--warn)}
+.tier-chip small{font-weight:400;opacity:.85}
+
+/* ========== Tab 导航 ========== */
+.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.tabs-inner{max-width:1200px;margin:0 auto;display:flex;overflow-x:auto}
+.tab-btn{flex:none;padding:14px 20px;font-size:15px;font-weight:600;color:var(--ink2);border-bottom:3px solid transparent;transition:.15s}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--tuhu);border-color:var(--tuhu)}
+.tab-btn .step{display:inline-block;width:20px;height:20px;line-height:20px;border-radius:6px;background:#EEF0F3;color:var(--ink2);font-size:12px;text-align:center;margin-right:7px;font-weight:700}
+.tab-btn.active .step{background:var(--tuhu);color:#fff}
+main{max-width:1200px;margin:0 auto;padding:22px 20px 60px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ========== 通用小组件 ========== */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge.hc{background:#FDECEC;color:#B91C1C;border:1px solid #F5C6C6}
+.badge.warn{background:var(--warn);color:#fff}
+.badge.open{background:#EEF0F3;color:var(--ink2);border:1px solid var(--line)}
+.badge.owner{background:#E0ECFF;color:#1D4ED8;border:1px solid #C3D7FF}
+.st{display:inline-flex;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.st-none{background:#FEE2E2;color:#B91C1C}
+.st-follow{background:#E0ECFF;color:#1D4ED8}
+.st-site{background:#E0F2FE;color:#0369A1}
+.st-sign{background:#EDE9FE;color:#6D28D9}
+.st-build{background:#FFEDD5;color:#C2410C}
+.st-live{background:#DCFCE7;color:#15803D}
+.sec-title{font-size:16px;font-weight:700;margin:0 0 4px}
+.sec-desc{font-size:13px;color:var(--ink2);margin-bottom:16px}
+
+/* ========== 手机框（途虎通 / 易行） ========== */
+.t1-layout{display:flex;justify-content:center}
+.phone{width:392px;max-width:100%;flex:none;background:#111;border-radius:42px;padding:10px;box-shadow:0 18px 48px rgba(20,24,32,.22)}
+.phone-screen{background:#F0F1F4;border-radius:34px;overflow:hidden;height:780px;display:flex;flex-direction:column}
+.phone-status{background:var(--tuhu);color:#fff;font-size:11px;padding:8px 22px 0;display:flex;justify-content:space-between}
+.app-header{background:var(--tuhu);color:#fff;padding:8px 14px 12px;display:flex;align-items:center;gap:10px}
+.phone.blue .phone-status,.phone.blue .app-header{background:var(--xmz)}
+.app-header .back{font-size:18px;line-height:1}
+.app-header .t{font-size:16px;font-weight:700}
+.app-header .s{font-size:11px;opacity:.85}
+/* 群聊头部 */
+.group-header .gh-main{flex:1;min-width:0}
+.group-header .gh-main .t{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.gh-count{font-weight:500;opacity:.85;font-size:13px}
+.gh-menu{font-size:18px;font-weight:700;letter-spacing:1px;flex:none;opacity:.9}
+/* 群通知条 */
+.group-notice{text-align:center;font-size:11px;color:var(--ink3);background:rgba(0,0,0,.05);border-radius:6px;padding:5px 10px;margin:0 auto 12px;max-width:88%;line-height:1.5}
+/* 机器人消息行 */
+.msg-row{display:flex;gap:8px;margin-bottom:16px;align-items:flex-start}
+.bot-avatar{width:34px;height:34px;flex:none;border-radius:8px;background:var(--tuhu);color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(255,102,0,.3)}
+.msg-main{flex:1;min-width:0}
+.msg-sender{font-size:11.5px;color:var(--ink3);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.bot-tag{background:#EAF3FF;color:#2563EB;border:1px solid #CFE2FF;border-radius:4px;padding:0 5px;font-size:10px;font-weight:600;line-height:16px}
+.msg-main .push-card{margin-bottom:0}
+.chat-scroll{flex:1;overflow-y:auto;padding:14px 12px 20px}
+.date-divider{text-align:center;font-size:11px;color:var(--ink3);margin:6px 0 12px}
+.push-card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(20,24,32,.06);margin-bottom:14px;overflow:hidden;border-left:4px solid var(--warn)}
+.push-card.bd{border-left-color:var(--xmz)}
+.pc-head{display:flex;align-items:center;gap:8px;padding:11px 14px 0;flex-wrap:wrap}
+.pc-head .time{margin-left:auto;font-size:11px;color:var(--ink3)}
+.pc-title{padding:8px 14px 0;font-size:14px;font-weight:700;line-height:1.55}
+.pc-title .addr-inline{color:var(--ink2);font-weight:500;font-size:12.5px}
+.pc-count{padding:4px 14px 0;font-size:13px;color:var(--ink2);line-height:1.9}
+.pc-count b{font-size:22px;font-weight:800;margin:0 3px;color:var(--warn)}
+.pc-rows{padding:8px 14px 2px;font-size:12.5px;color:var(--ink2)}
+.pc-rows .row{display:flex;gap:6px;margin-bottom:4px}
+.pc-rows .k{color:var(--ink3);flex:none}
+.pc-rows .near div{margin-bottom:2px}
+.pc-btns{display:flex;gap:10px;padding:12px 14px 14px}
+.btn{flex:1;padding:9px 0;border-radius:9px;font-size:13.5px;font-weight:600;text-align:center;transition:.15s}
+.btn-primary{background:var(--tuhu);color:#fff}
+.btn-primary:hover{background:var(--tuhu-deep)}
+.btn-ghost{background:#fff;color:var(--tuhu);border:1px solid var(--tuhu)}
+.btn-ghost:hover{background:#FFF3EA}
+.btn-done{background:#EEF0F3;color:var(--ink3);border:1px solid var(--line);cursor:default}
+.pc-claimed{padding:0 14px 12px;font-size:12px;color:var(--ok);display:flex;align-items:center;gap:5px}
+/* 招商视角切换 */
+.persona-row{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:12.5px;color:var(--ink3)}
+.p-chip{padding:5px 14px;border-radius:99px;border:1px solid var(--line);font-size:12.5px;color:var(--ink2);background:#fff;transition:.15s}
+.p-chip:hover{border-color:#C8CDD4}
+.p-chip.on{background:var(--xmz);border-color:var(--xmz);color:#fff;font-weight:600}
+/* 申请单ID填写块（易行卡片） */
+.appid-block{margin:10px 14px 14px;background:#F5F8FF;border:1px solid #D8E4FF;border-radius:9px;padding:10px 12px}
+.appid-block .lbl{font-size:12.5px;color:#1D4ED8;font-weight:600;margin-bottom:8px}
+.appid-row{display:flex;gap:8px}
+.appid-row input{flex:1;min-width:0;border:1px solid #C9D6EE;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.appid-row input:focus{border-color:var(--xmz)}
+.appid-row .go{flex:none;background:var(--xmz);color:#fff;border-radius:8px;padding:0 16px;font-size:13px;font-weight:600}
+.appid-row .go:hover{background:#1D4FC4}
+.appid-err{font-size:11.5px;color:var(--warn);margin-top:5px;display:none}
+.appid-err.show{display:block}
+.appid-done{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ok);font-weight:600;flex-wrap:wrap}
+.appid-done .idv{color:var(--ink);font-weight:700}
+
+/* ========== Tab1 战区群 · 明细表格 ========== */
+.grp-toolbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px}
+.tool-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tool-label{font-size:12.5px;color:var(--ink3);font-weight:600;flex:none}
+.filter-chip{padding:5px 13px;border-radius:99px;border:1px solid var(--line);font-size:12.5px;color:var(--ink2);background:#fff;transition:.15s}
+.filter-chip:hover{border-color:#C8CDD4}
+.filter-chip.active{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.badge.gray{background:#EEF0F3;color:var(--ink2)}
+.grp-chat{background:#ECEDF0;border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px 20px}
+.grp-bubble{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(20,24,32,.06);overflow:hidden;border-left:4px solid var(--warn)}
+.gb-title{font-size:14px;font-weight:700;padding:12px 15px 0}
+.gb-sub{font-size:12.5px;color:var(--ink2);padding:6px 15px 12px;line-height:1.7}
+.gb-sub b{color:var(--jd)}
+.grp-table-wrap{border:none;border-top:1px solid var(--line);border-radius:0;max-height:460px}
+.badge.exp2{background:#F3E8EE;color:#881337;border:1px solid #E7CDD9}
+/* ========== 竞对地图 ========== */
+.map-wrap{position:relative;background:#E9EDF1;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.map-svg{display:block;width:100%;height:auto}
+.store-pop{position:absolute;width:312px;background:#fff;border-radius:12px;box-shadow:0 12px 36px rgba(20,24,32,.24);border:1px solid var(--line);z-index:20;display:none;font-size:13px}
+.store-pop.show{display:block;animation:popin .18s ease}
+@keyframes popin{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+.sp-head{padding:12px 14px 0;display:flex;align-items:flex-start;gap:7px;flex-wrap:wrap}
+.tag-solid{background:#E1251B;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:600;flex:none;line-height:19px}
+.tag-light{background:#FDECEC;color:#D9261C;border:1px solid #F5C6C6;border-radius:4px;padding:0 8px;font-size:11px;font-weight:600;flex:none;line-height:19px}
+.sp-head .nm{font-size:14.5px;font-weight:700;line-height:1.45;flex:1;min-width:120px}
+.sp-close{flex:none;width:24px;height:24px;border-radius:50%;background:#F0F1F4;color:var(--ink3);font-size:14px;line-height:24px;text-align:center;margin-left:auto}
+.sp-close:hover{background:#E4E7EC;color:var(--ink)}
+.sp-card{display:flex;gap:11px;padding:11px 14px 0}
+.sp-photo{width:88px;height:88px;flex:none;border-radius:8px;background:linear-gradient(160deg,#E8352B,#B71C13);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:14px;letter-spacing:3px;line-height:1.6}
+.sp-info{flex:1;font-size:12.5px;color:var(--ink)}
+.sp-info .r{display:flex;gap:5px;margin-bottom:3px}
+.sp-info .k{color:var(--ink3);flex:none}
+.sp-info .days{color:var(--warn);font-weight:800;font-size:14px}
+.sp-addr{display:flex;gap:5px;padding:9px 14px 13px;font-size:12px;color:var(--ink2);line-height:1.5}
+.sp-addr .pin{flex:none;color:var(--ink3)}
+.sp-arrow{position:absolute;left:50%;bottom:-7px;width:14px;height:14px;background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.store-pop.below .sp-arrow{bottom:auto;top:-7px;transform:translateX(-50%) rotate(225deg)}
+.mk-label{font-size:10.5px;fill:#3A4048;paint-order:stroke;stroke:#F5F7FA;stroke-width:3px;font-weight:600}
+.road-label{font-size:10px;fill:#96A0AC;paint-order:stroke;stroke:#EDF1F5;stroke-width:3px}
+.dist-label{font-size:15px;fill:#AEB6C0;font-weight:700;letter-spacing:.35em;opacity:.75}
+.marker{cursor:pointer}
+.pulse-ring{animation:pulse 1.9s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{transform:scale(.55);opacity:.75}80%{transform:scale(1.9);opacity:0}100%{transform:scale(1.9);opacity:0}}
+.sel-ring{animation:selspin 1.6s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes selspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.pulse-ring,.sel-ring{animation:none}}
+
+/* ========== 中台 ========== */
+.push-preview{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.pp-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.seg{display:inline-flex;background:#EEF0F3;border-radius:9px;padding:3px}
+.seg button{padding:5px 16px;border-radius:7px;font-size:13px;font-weight:600;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--tuhu);box-shadow:0 1px 3px rgba(20,24,32,.1)}
+.rule-chips{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.rule-chip{font-size:12px;color:var(--ink2);background:#F5F6F8;border:1px solid var(--line);border-radius:99px;padding:3px 11px}
+.pp-msg{background:#F7F8FA;border:1px solid var(--line);border-radius:10px;padding:13px 15px;font-size:13.5px;line-height:1.95;position:relative}
+.pp-msg::before{content:"途虎通 · 发送给 方露瑶";position:absolute;top:-9px;left:12px;background:#F7F8FA;padding:0 8px;font-size:11px;color:var(--ink3);border:1px solid var(--line);border-radius:99px;line-height:16px}
+.pp-msg b.hl{color:var(--jd)}
+.msg-link{color:#1D4ED8;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.msg-link:hover{color:#153db8}
+.mt-detail-wrap{margin-top:14px;animation:fadein .2s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.stat-card .lb{font-size:12.5px;color:var(--ink3)}
+.stat-card .vl{font-size:30px;font-weight:800;margin-top:2px;line-height:1.2}
+.stat-card .vl small{font-size:13px;font-weight:500;color:var(--ink3);margin-left:3px}
+.stat-card.red .vl{color:var(--warn)}
+.stat-card.orange .vl{color:var(--tuhu)}
+.stat-card.green .vl{color:var(--ok)}
+.funnel-head{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-bottom:12px}
+.funnel-head .fn-title{margin-right:0}
+.date-range{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+.dr-label{color:var(--ink3);font-weight:600}
+.date-range input[type=date]{border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12.5px;font-family:inherit;color:var(--ink);outline:none;background:#fff}
+.date-range input[type=date]:focus{border-color:var(--tuhu)}
+.dr-sep{color:var(--ink3)}
+.dr-preset{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font-size:12px;color:var(--ink2);transition:.15s}
+.dr-preset:hover{border-color:var(--tuhu);color:var(--tuhu)}
+.funnel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;flex-wrap:wrap;gap:6px 0}
+.table-head{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-bottom:10px}
+.th-title{font-size:13px;font-weight:700;flex:none}
+.fn-title{font-size:13px;font-weight:700;margin-right:18px;flex:none}
+.fn-box{text-align:center;padding:6px 16px;border-radius:10px;background:#F7F8FA;border:1px solid var(--line);cursor:pointer;transition:.15s;user-select:none}
+.fn-box:hover{border-color:#C8CDD4}
+.fn-box.active{border-color:var(--tuhu);background:#FFF3EA;box-shadow:0 0 0 1px var(--tuhu) inset}
+.fn-box .n{font-size:22px;font-weight:800}
+.fn-box .t{font-size:11.5px;color:var(--ink3)}
+.fn-arrow{color:#C4CAD2;font-size:18px;margin:0 8px}
+.fn-hint{margin-left:auto;font-size:12px;color:var(--ink3)}
+.table-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:auto}
+.tbl-filter{display:none;padding:9px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink2);background:#FFFBF7;align-items:center;gap:12px}
+.tbl-filter.show{display:flex}
+.clear-f{color:#1D4ED8;font-size:12.5px}
+.clear-f:hover{text-decoration:underline}
+.dtl-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1240px}
+.dtl-table th{background:#F7F8FA;color:var(--ink2);font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+.dtl-table td{padding:10px 12px;border-bottom:1px solid #F0F1F4;white-space:nowrap;vertical-align:top}
+.dtl-table tr:last-child td{border-bottom:none}
+.dtl-table tr:hover td{background:#FAFBFC}
+.days-cell{font-weight:800;font-size:14px;color:var(--warn)}
+.link-btn{color:#1D4ED8;font-size:12.5px}
+.link-btn:hover{text-decoration:underline}
+.tbl-foot{padding:10px 14px;font-size:12px;color:var(--ink3)}
+.empty-row td{text-align:center;color:var(--ink3);padding:26px 12px}
+
+/* ========== 推送给招商 弹窗 ========== */
+.modal-mask{position:fixed;inset:0;background:rgba(20,24,32,.45);z-index:99;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:16px;width:340px;max-width:100%;padding:20px;box-shadow:0 20px 60px rgba(20,24,32,.3);animation:popin .18s ease}
+.modal h3{font-size:15.5px;font-weight:700;margin-bottom:4px}
+.modal .m-store{font-size:12.5px;color:var(--ink2);margin-bottom:14px}
+.modal label{font-size:12.5px;color:var(--ink3);display:block;margin-bottom:6px}
+.modal input{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px;font-family:inherit;outline:none}
+.modal input:focus{border-color:var(--tuhu)}
+.modal .m-tip{font-size:12px;color:var(--ink3);background:#F7F8FA;border-radius:8px;padding:8px 10px;margin-top:10px;line-height:1.6}
+.modal .m-btns{display:flex;gap:10px;margin-top:14px}
+.modal .m-btns .btn{padding:9px 0}
+.m-err{font-size:12px;color:var(--warn);margin-top:6px;display:none}
+.m-err.show{display:block}
+
+/* ========== Tab5 实时看板 ========== */
+.dash-topbar{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.dash-update{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dash-update b{color:var(--ink)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:livepulse 2s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 6px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+.upd-next{color:var(--ink3);padding-left:8px;border-left:1px solid var(--line)}
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;position:relative;overflow:hidden}
+.kpi-card .kl{font-size:12.5px;color:var(--ink3)}
+.kpi-card .kv{font-size:30px;font-weight:800;line-height:1.15;margin-top:3px}
+.kpi-card .kv small{font-size:13px;font-weight:500;color:var(--ink3);margin-left:3px}
+.kpi-card .kd{font-size:11.5px;margin-top:4px;display:flex;align-items:center;gap:3px}
+.kpi-card .kd.up{color:var(--ok)}
+.kpi-card .kd.flat{color:var(--ink3)}
+.kpi-spark{position:absolute;right:10px;bottom:8px;opacity:.5}
+/* 看板卡片 */
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.dash-card-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.dc-title{font-size:14.5px;font-weight:700}
+.legend-toggle{display:flex;gap:6px;flex-wrap:wrap}
+.lg-item{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink2);padding:3px 9px;border-radius:99px;border:1px solid var(--line);cursor:pointer;transition:.15s;user-select:none}
+.lg-item .lg-dot{width:9px;height:9px;border-radius:2px;flex:none}
+.lg-item.off{opacity:.4}
+.lg-item.off .lg-dot{background:#C4CAD2!important}
+/* 趋势图 */
+.trend-svg{display:block;width:100%;height:auto;overflow:visible}
+.trend-grid{stroke:#EEF1F4;stroke-width:1}
+.trend-axis-label{font-size:10px;fill:var(--ink3)}
+.trend-line{fill:none;stroke-width:2.2;transition:opacity .15s}
+.trend-area{opacity:.06}
+.trend-dot{transition:opacity .15s}
+.trend-hover-line{stroke:#C4CAD2;stroke-width:1;stroke-dasharray:4 3}
+.trend-tip{position:absolute;pointer-events:none;background:#23262B;color:#fff;border-radius:8px;padding:8px 11px;font-size:11.5px;line-height:1.7;z-index:20;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.trend-tip.show{opacity:1}
+.trend-tip .tt-date{font-weight:700;margin-bottom:4px;color:#fff}
+.trend-tip .tt-row{display:flex;align-items:center;gap:6px;color:#D5D9DF}
+.trend-tip .tt-dot{width:8px;height:8px;border-radius:2px;flex:none}
+.trend-tip .tt-v{margin-left:auto;font-weight:700;color:#fff;padding-left:12px}
+.trend-wrap{position:relative}
+/* 历史回看 */
+.snap-picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.snap-picker input[type=range]{width:180px;accent-color:var(--tuhu)}
+.snap-picker input[type=date]{border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12.5px;font-family:inherit;color:var(--ink);outline:none}
+.snap-picker input[type=date]:focus{border-color:var(--tuhu)}
+.snap-body{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.snap-funnel{flex:1;min-width:320px;display:flex;flex-direction:column;gap:7px}
+.snap-bar-row{display:flex;align-items:center;gap:10px}
+.snap-bar-label{width:78px;flex:none;font-size:12.5px;color:var(--ink2);text-align:right}
+.snap-bar-track{flex:1;background:#F0F1F4;border-radius:6px;height:26px;position:relative;overflow:hidden}
+.snap-bar-fill{height:100%;border-radius:6px;transition:width .4s cubic-bezier(.4,0,.2,1);min-width:2px}
+.snap-bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:var(--ink)}
+.snap-compare{width:230px;flex:none;background:#F7F8FA;border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.snap-compare h4{font-size:12.5px;font-weight:700;margin-bottom:10px;color:var(--ink2)}
+.snap-cmp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed #E4E7EC;font-size:12.5px}
+.snap-cmp-row:last-child{border:none}
+.snap-cmp-row .cmp-k{color:var(--ink3)}
+.snap-cmp-row .cmp-v{font-weight:700}
+.cmp-delta{font-size:11px;margin-left:5px}
+.cmp-delta.up{color:var(--ok)}
+.cmp-delta.down{color:var(--warn)}
+.cmp-delta.flat{color:var(--ink3)}
+@media (max-width:720px){
+  .snap-compare{width:100%}
+  .snap-picker input[type=range]{width:120px}
+}
+footer{max-width:1200px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:var(--ink3);text-align:center}
+@media (max-width:860px){
+  .tier-legend{margin-left:0}
+  .phone{margin:0 auto}
+  .fn-hint{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 顶栏 ================= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-dot">途</div>
+    <div>
+      <h1>竞对地图 · 翻店预警</h1>
+      <div class="sub">京东门店合约到期智能监控与推送 · 原型 V10.0 · 数据日期 2026-07-28 · 示例范围：湖北省武汉市</div>
+    </div>
+    <div class="tier-legend">
+      <span class="tier-chip">预警口径 <small>合约剩余≤30天</small></span>
+    </div>
+  </div>
+</header>
+
+<!-- ================= Tab 导航 ================= -->
+<nav class="tabs"><div class="tabs-inner">
+  <button class="tab-btn active" data-tab="1" onclick="switchTab(1)"><span class="step">1</span>战区预警群 · 战区/BDM</button>
+  <button class="tab-btn" data-tab="2" onclick="switchTab(2)"><span class="step">2</span>竞对地图 · 倒计时标识</button>
+  <button class="tab-btn" data-tab="3" onclick="switchTab(3)"><span class="step">3</span>中台汇总推送 · 方露瑶</button>
+</div></nav>
+
+<main>
+<!-- ================= Tab1 途虎通推送 ================= -->
+<section class="tab-panel active" id="tab1">
+  <h2 class="sec-title">战区预警群 · 机器人推送（群成员：战区经理 + 区域 BDM）</h2>
+  <p class="sec-desc">按战区拉群，每周一 11:00 由「翻店预警助手」机器人在群内推送上周 7 天累计需预警的京东门店明细表，按预估合约到期日从新到旧排序。</p>
+  <div class="grp-chat">
+    <div class="group-notice">「翻店预警助手」已加入群聊，每周一 11:00 在此推送翻店预警明细</div>
+    <div class="date-divider">2026年7月27日 周一 · 11:00</div>
+    <div class="msg-row">
+      <div class="bot-avatar">虎</div>
+      <div class="msg-main">
+        <div class="msg-sender">翻店预警助手 <span class="bot-tag">机器人</span></div>
+        <div class="grp-bubble">
+          <div class="gb-title">【翻店预警 · 上周累计】07-21 ～ 07-27</div>
+          <div class="gb-sub" id="grpMsgSub"></div>
+          <div class="table-wrap grp-table-wrap">
+            <table class="dtl-table">
+              <thead><tr>
+                <th>京东门店名称</th><th>京东门店状态</th><th>省市区</th><th>文字地址</th>
+                <th>预估合约到期日</th><th>预估合同到期天数</th><th>高竞争城市</th>
+                <th>800m内途虎门店</th><th>距离</th><th>定位</th>
+              </tr></thead>
+              <tbody id="grpBody"></tbody>
+            </table>
+            <div class="tbl-foot">按预估合约到期日从新到旧排序 · 上周 7 天累计需预警门店</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Tab2 竞对地图 ================= -->
+<section class="tab-panel" id="tab2">
+  <h2 class="sec-title">竞对地图 · 预估合约到期倒计时标识</h2>
+  <div class="map-wrap" id="mapWrap" style="margin-top:12px">
+    <svg class="map-svg" id="mapSvg" viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" aria-label="武汉市竞对地图示意">
+      <rect width="1000" height="640" fill="#EDF1F5"/>
+      <g fill="#E4E9EF">
+        <rect x="120" y="90" width="150" height="80" rx="6"/><rect x="300" y="60" width="120" height="70" rx="6"/>
+        <rect x="140" y="220" width="110" height="90" rx="6"/><rect x="430" y="160" width="120" height="80" rx="6"/>
+        <rect x="180" y="460" width="130" height="80" rx="6"/><rect x="500" y="510" width="130" height="70" rx="6"/>
+        <rect x="640" y="330" width="120" height="80" rx="6"/><rect x="770" y="200" width="140" height="90" rx="6"/>
+        <rect x="700" y="540" width="150" height="60" rx="6"/><rect x="850" y="380" width="110" height="90" rx="6"/>
+      </g>
+      <ellipse cx="605" cy="405" rx="52" ry="34" fill="#D9EAD3"/>
+      <text x="605" y="409" text-anchor="middle" class="road-label" fill="#8FAE83">南湖公园</text>
+      <path d="M110,660 C 260,520 360,420 480,300 C 590,190 660,110 770,-20 L 850,-20 C 740,120 660,210 550,330 C 440,450 330,560 190,660 Z" fill="#C9DDF2"/>
+      <text x="560" y="270" class="dist-label" fill="#7FA5C9" transform="rotate(-46 560 270)" opacity=".8">长 江</text>
+      <path d="M0,368 C 120,362 260,356 356,352 L 372,338 C 380,352 392,364 404,376 L 388,388 C 280,384 130,382 0,392 Z" fill="#C9DDF2"/>
+      <text x="150" y="372" class="road-label" fill="#7FA5C9">汉 江</text>
+      <g stroke="#B9C4D0" stroke-width="5" stroke-linecap="round">
+        <line x1="392" y1="430" x2="470" y2="452"/>
+        <line x1="560" y1="212" x2="640" y2="238"/>
+      </g>
+      <g stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" fill="none" opacity=".95">
+        <path d="M120,150 C 260,180 400,205 545,235"/>
+        <path d="M205,110 L 232,280"/>
+        <path d="M420,80 C 470,95 520,108 575,118"/>
+        <path d="M180,392 C 240,420 300,450 360,478"/>
+        <path d="M480,436 C 560,458 640,480 700,494"/>
+        <path d="M640,560 C 730,530 820,498 900,462"/>
+        <path d="M760,560 L 880,430"/>
+        <path d="M600,205 C 660,225 710,245 760,268"/>
+      </g>
+      <g stroke="#D5DBE2" stroke-width="1.4" fill="none">
+        <path d="M120,150 C 260,180 400,205 545,235"/><path d="M205,110 L 232,280"/>
+        <path d="M420,80 C 470,95 520,108 575,118"/><path d="M180,392 C 240,420 300,450 360,478"/>
+        <path d="M480,436 C 560,458 640,480 700,494"/><path d="M640,560 C 730,530 820,498 900,462"/>
+        <path d="M760,560 L 880,430"/><path d="M600,205 C 660,225 710,245 760,268"/>
+      </g>
+      <text x="330" y="185" class="road-label" transform="rotate(8 330 185)">解放大道</text>
+      <text x="243" y="200" class="road-label" transform="rotate(81 243 200)">古田路</text>
+      <text x="488" y="92" class="road-label" transform="rotate(11 488 92)">后湖大道</text>
+      <text x="252" y="418" class="road-label" transform="rotate(24 252 418)">龙阳大道</text>
+      <text x="576" y="446" class="road-label" transform="rotate(14 576 446)">南湖大道</text>
+      <text x="782" y="516" class="road-label" transform="rotate(-20 782 516)">光谷大道</text>
+      <text x="672" y="228" class="road-label" transform="rotate(18 672 228)">徐东大街</text>
+      <text x="185" y="320" class="dist-label">硚口区</text>
+      <text x="440" y="130" class="dist-label">江岸区</text>
+      <text x="215" y="545" class="dist-label">汉阳区</text>
+      <text x="660" y="300" class="dist-label">武昌区</text>
+      <text x="800" y="590" class="dist-label">洪山区</text>
+      <g id="markerLayer"></g>
+    </svg>
+
+    <div class="store-pop" id="storePop" role="dialog" aria-label="京东门店名片">
+      <div class="sp-arrow"></div>
+      <div id="popInner"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Tab3 中台汇总 ================= -->
+<section class="tab-panel" id="tab3">
+  <h2 class="sec-title">中台汇总推送（接收人：方露瑶）</h2>
+  <p class="sec-desc">每周一 11:00 定时推送，<b>无新增则不推送</b>；推送上周 7 天累计需预警门店统计。</p>
+
+  <div class="push-preview">
+    <div class="pp-top">
+      <div class="rule-chips" style="margin-left:0">
+        <span class="rule-chip">每周一 11:00 推送</span>
+        <span class="rule-chip">无新增不推送</span>
+        <span class="rule-chip">口径：京东门店预估合约到期（60天内）</span>
+      </div>
+    </div>
+    <div class="pp-msg" id="ppMsg"></div>
+  </div>
+
+  <div class="mt-detail-wrap" id="mtDetailWrap" style="display:none">
+    <div class="table-wrap">
+      <table class="dtl-table">
+        <thead><tr>
+          <th>京东门店名称</th><th>京东门店状态</th><th>省市区</th><th>文字地址</th>
+          <th>预估合约到期日</th><th>预估合同到期天数</th><th>高竞争城市</th>
+          <th>800m内途虎门店</th><th>距离</th><th>定位</th>
+        </tr></thead>
+        <tbody id="mtBody"></tbody>
+      </table>
+      <div class="tbl-foot">按预估合约到期日从新到旧排序 · 上周 7 天累计需预警门店</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- 推送给招商 弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <h3>推送给招商跟进</h3>
+    <div class="m-store" id="mStore"></div>
+    <label for="mName">招商姓名</label>
+    <input id="mName" type="text" placeholder="请输入招商姓名" autocomplete="off">
+    <div class="m-err" id="mErr">请输入招商姓名</div>
+    <div class="m-tip">确认后将通过<b>易行 App</b> 向该招商发送跟进任务，跟进状态实时回流中台明细。</div>
+    <div class="m-btns">
+      <button class="btn btn-done" style="cursor:pointer" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmPush()">确认推送</button>
+    </div>
+  </div>
+</div>
+
+<footer>翻店预警原型 V10.0 · 交互演示用示例数据（武汉市 5 家京东门店）</footer>
+
+<script>
+/* ================= 数据 ================= */
+const JD=[
+ {id:"jd01",sid:"JD10241",name:"京东养车·古田路店",dist:"湖北省武汉市硚口区",addr:"古田三路与解放大道交汇东南角（临街一楼）",expiry:"2026-07-28",expCN:"2026年7月28日",days:0,open:"2023-05",status:"营业中",hc:true,near:[{n:"途虎养车·古田中路店",open:"2019-06",d:"87m"}],x:222,y:180,time:"09:12"},
+ {id:"jd02",sid:"JD10318",name:"京东养车·后湖大道店",dist:"湖北省武汉市江岸区",addr:"后湖大道同安家园临街商铺",expiry:"2026-07-30",expCN:"2026年7月30日",days:2,open:"2024-01",status:"营业中",hc:true,near:[{n:"途虎养车·后湖店",open:"2023-02",d:"260m"}],x:500,y:120,time:"08:40"},
+ {id:"jd03",sid:"JD10433",name:"京东养车·王家湾店",dist:"湖北省武汉市汉阳区",addr:"龙阳大道王家湾商圈北侧（十里铺地铁站C口旁）",expiry:"2026-08-02",expCN:"2026年8月2日",days:5,open:"2022-03",status:"营业中",hc:false,near:[{n:"途虎养车·龙阳大道店",open:"2018-12",d:"410m"}],x:286,y:452,time:"11:02"},
+ {id:"jd04",sid:"JD10502",name:"京东养车·光谷金融港店",dist:"湖北省武汉市洪山区",addr:"光谷金融港B区临街商铺（金融港中路12号）",expiry:"2026-08-05",expCN:"2026年8月5日",days:8,open:"2022-11",status:"营业中",hc:true,near:[{n:"途虎养车·光谷大道店",open:"2022-08",d:"620m"}],x:832,y:486,time:"10:26"},
+ {id:"jd05",sid:"JD10407",name:"京东养车·徐东大街店",dist:"湖北省武汉市武昌区",addr:"徐东大街销品茂对面临街商铺",expiry:"2026-08-09",expCN:"2026年8月9日",days:12,open:"2023-07",status:"营业中",hc:false,near:[{n:"途虎养车·徐东店",open:"2021-04",d:"350m"}],x:660,y:300,time:"10:41"},
+ {id:"jd06",sid:"JD10199",name:"京东养车·南湖大道店",dist:"湖北省武汉市洪山区",addr:"南湖大道恒安路口西南角（南湖雅园底商）",expiry:"2026-08-14",expCN:"2026年8月14日",days:17,open:"2023-09",status:"营业中",hc:true,near:[{n:"途虎养车·南湖店",open:"2020-05",d:"310m"}],x:590,y:475,time:"09:47"},
+ {id:"jd07",sid:"JD10461",name:"京东养车·武昌积玉桥店",dist:"湖北省武汉市武昌区",addr:"和平大道积玉桥地铁站B口临街",expiry:"2026-08-19",expCN:"2026年8月19日",days:22,open:"2023-11",status:"营业中",hc:false,near:[{n:"途虎养车·徐东店",open:"2021-04",d:"720m"}],x:700,y:360,time:"08:58"},
+ {id:"jd08",sid:"JD10488",name:"京东养车·常青花园店",dist:"湖北省武汉市江岸区",addr:"常青路常青花园三小区门口",expiry:"2026-08-25",expCN:"2026年8月25日",days:28,open:"2024-03",status:"营业中",hc:true,near:[{n:"途虎养车·常青路店",open:"2022-09",d:"480m"}],x:372,y:118,time:"09:33"},
+ {id:"jd09",sid:"JD10537",name:"京东养车·街道口店",dist:"湖北省武汉市洪山区",addr:"珞喻路街道口地铁站A口商业体一层",expiry:"2026-09-01",expCN:"2026年9月1日",days:35,open:"2022-06",status:"营业中",hc:false,near:[{n:"途虎养车·南湖店",open:"2020-05",d:"690m"}],x:690,y:436,time:"10:07"},
+ {id:"jd10",sid:"JD10566",name:"京东养车·钟家村店",dist:"湖北省武汉市汉阳区",addr:"钟家村地铁站汉阳大道商业街",expiry:"2026-09-08",expCN:"2026年9月8日",days:42,open:"2021-08",status:"营业中",hc:true,near:[{n:"途虎养车·龙阳大道店",open:"2018-12",d:"560m"}],x:300,y:470,time:"11:15"},
+ {id:"jd11",sid:"JD10593",name:"京东养车·杨春湖店",dist:"湖北省武汉市洪山区",addr:"杨春湖高铁站东广场商业体",expiry:"2026-09-16",expCN:"2026年9月16日",days:50,open:"2023-04",status:"营业中",hc:false,near:[{n:"途虎养车·南湖店",open:"2020-05",d:"780m"}],x:742,y:353,time:"08:47"},
+ {id:"jd12",sid:"JD10620",name:"京东养车·宝丰路店",dist:"湖北省武汉市硚口区",addr:"宝丰路与中山大道交汇处临街",expiry:"2026-09-25",expCN:"2026年9月25日",days:59,open:"2023-02",status:"营业中",hc:false,near:[{n:"途虎养车·汉西建材店",open:"2020-11",d:"560m"}],x:330,y:246,time:"10:33"}
+];
+
+/* 地图仅展示少量有代表性的门店（避免全量堆叠）：覆盖不同区、不同到期状态 */
+const MAP_STORES=[
+ {id:'m1',sid:'JD10241',name:'京东养车·古田路店',dist:'湖北省武汉市硚口区',addr:'古田三路与解放大道交汇东南角（临街一楼）',
+  expiry:'2026-07-25',expCN:'2026年7月25日',days:-3,open:'2023-05',status:'营业中',hc:true,
+  near:[{n:'途虎养车·古田中路店',open:'2019-06',d:'87m'}],x:222,y:180,time:'09:12'},
+ {id:'m2',sid:'JD10318',name:'京东养车·后湖大道店',dist:'湖北省武汉市江岸区',addr:'后湖大道同安家园临街商铺',
+  expiry:'2026-07-30',expCN:'2026年7月30日',days:2,open:'2024-01',status:'营业中',hc:true,
+  near:[{n:'途虎养车·后湖店',open:'2023-02',d:'260m'}],x:500,y:120,time:'08:40'},
+ {id:'m3',sid:'JD10407',name:'京东养车·徐东大街店',dist:'湖北省武汉市武昌区',addr:'徐东大街销品茂对面临街商铺',
+  expiry:'2026-07-28',expCN:'2026年7月28日',days:0,open:'2023-07',status:'营业中',hc:false,
+  near:[{n:'途虎养车·徐东店',open:'2021-04',d:'350m'}],x:660,y:300,time:'10:41'},
+ {id:'m4',sid:'JD10199',name:'京东养车·南湖大道店',dist:'湖北省武汉市洪山区',addr:'南湖大道恒安路口西南角（南湖雅园底商）',
+  expiry:'2026-07-20',expCN:'2026年7月20日',days:-8,open:'2023-09',status:'营业中',hc:true,
+  near:[{n:'途虎养车·南湖店',open:'2020-05',d:'310m'}],x:590,y:475,time:'09:47'},
+ {id:'m5',sid:'JD10433',name:'京东养车·王家湾店',dist:'湖北省武汉市汉阳区',addr:'龙阳大道王家湾商圈北侧（十里铺地铁站C口旁）',
+  expiry:'2026-07-15',expCN:'2026年7月15日',days:-13,open:'2022-03',status:'营业中',hc:false,
+  near:[{n:'途虎养车·龙阳大道店',open:'2018-12',d:'410m'}],x:286,y:452,time:'11:02'},
+ {id:'m6',sid:'JD10502',name:'京东养车·光谷金融港店',dist:'湖北省武汉市洪山区',addr:'光谷金融港B区临街商铺（金融港中路12号）',
+  expiry:'2026-08-02',expCN:'2026年8月2日',days:5,open:'2022-11',status:'营业中',hc:true,
+  near:[{n:'途虎养车·光谷大道店',open:'2022-08',d:'620m'}],x:832,y:486,time:'10:26'}
+];
+
+const TUHU=[
+ {name:'途虎养车·古田中路店',x:196,y:186},{name:'途虎养车·汉西建材店',x:150,y:214},
+ {name:'途虎养车·后湖店',x:462,y:120},{name:'途虎养车·龙阳大道店',x:238,y:428},
+ {name:'途虎养车·南湖店',x:540,y:486},{name:'途虎养车·光谷大道店',x:766,y:522}
+];
+const XMZ=[{name:'小拇指·宝丰路店',x:330,y:246},{name:'小拇指·街道口店',x:690,y:436}];
+const TMALL=[{name:'天猫养车·常青路店',x:372,y:118},{name:'天猫养车·徐东店',x:648,y:252}];
+const state={selected:null};
+
+/* ================= 工具 ================= */
+const byId=id=>JD.find(x=>x.id===id);
+const mapById=id=>MAP_STORES.find(x=>x.id===id);
+const distCN=s=>s.dist.replace('湖北省武汉市','湖北省·武汉市·');
+/* 预估合同到期天数文案 */
+function daysText(s){return s.days<0?`已到期${Math.abs(s.days)}天`:`${s.days}天`;}
+function isExpired(s){return s.days<0;}
+
+/* ================= Tab 切换 ================= */
+function switchTab(n){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==String(n)));
+  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',i===n-1));
+  if(n!==2)closePop();
+}
+
+/* ================= Tab1 战区群 · 明细表格 ================= */
+function grpFiltered(){
+  return JD.filter(s=>!isExpired(s))          /* 已到期不推送 */
+    .sort((a,b)=>b.expiry.localeCompare(a.expiry)); /* 从新到旧 */
+}
+function renderGrpTable(){
+  const rows=grpFiltered();
+  const total=rows.length, hc=rows.filter(s=>s.hc).length;
+  document.getElementById('grpMsgSub').innerHTML=
+    `上周 7 天累计需预警门店 <b>${total}</b> 家，其中高竞争城市 <b>${hc}</b> 家，<span class="msg-link" onclick="switchTab(2)">点击竞对地图进行查看</span>。`;
+  const tb=document.getElementById('grpBody');
+  tb.innerHTML=rows.map(s=>rowHTML(s)).join('');
+}
+/* 明细行（战区群与中台共用） */
+function rowHTML(s){
+  const nearN=s.near.map(n=>`${n.n}（${n.open}）`).join('<br>')||'—';
+  const nearD=s.near.map(n=>n.d).join('<br>')||'—';
+  return `<tr>
+    <td><b>${s.name}</b></td><td>${s.status}</td><td>${s.dist}</td>
+    <td style="white-space:normal;min-width:170px;color:var(--ink2)">${s.addr}</td>
+    <td class="num">${s.expiry}</td>
+    <td class="days-cell num">${daysText(s)}</td>
+    <td>${s.hc?'<span class="badge hc">是</span>':'否'}</td>
+    <td style="white-space:normal;min-width:160px">${nearN}</td>
+    <td class="num">${nearD}</td>
+    <td><button class="link-btn" onclick="locateStore('${s.id}')">地图定位</button></td>
+  </tr>`;
+}
+
+/* ================= Tab2 地图 ================= */
+const NS='http://www.w3.org/2000/svg';
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function renderMarkers(){
+  const layer=document.getElementById('markerLayer');
+  layer.innerHTML='';
+  const brands=[
+    {list:TUHU,color:'#FF6600',ch:'虎'},
+    {list:XMZ,color:'#2563EB',ch:'小'},
+    {list:TMALL,color:'#9333EA',ch:'猫'}
+  ];
+  brands.forEach(b=>{
+    b.list.forEach(m=>{
+      const g=svgEl('g',{class:'marker',transform:`translate(${m.x},${m.y})`});
+      g.appendChild(svgEl('circle',{r:10,fill:b.color,stroke:'#fff','stroke-width':2.5}));
+      const t=svgEl('text',{y:3.6,'text-anchor':'middle','font-size':10,fill:'#fff','font-weight':700});
+      t.textContent=b.ch;g.appendChild(t);
+      const lb=svgEl('text',{y:24,'text-anchor':'middle',class:'mk-label'});
+      lb.textContent=m.name.replace(/^(途虎养车|小拇指|天猫养车)·/,'');g.appendChild(lb);
+      layer.appendChild(g);
+    });
+  });
+  /* 地图仅显示未到期门店 */
+  MAP_STORES.filter(s=>s.days>=0).forEach(s=>{
+    const g=svgEl('g',{class:'marker',transform:`translate(${s.x},${s.y})`,'data-id':s.id});
+    if(s.days<=7){
+      g.appendChild(svgEl('circle',{r:12,fill:'none',stroke:'#DC2626','stroke-width':2,class:'pulse-ring'}));
+    }
+    if(state.selected===s.id){
+      g.appendChild(svgEl('circle',{r:17,fill:'none',stroke:'#DC2626','stroke-width':2.5,'stroke-dasharray':'5 5',class:'sel-ring'}));
+    }
+    g.appendChild(svgEl('rect',{x:-10,y:-10,width:20,height:20,rx:5,fill:'#E1251B',stroke:'#fff','stroke-width':2.5}));
+    const jt=svgEl('text',{y:4,'text-anchor':'middle','font-size':10,fill:'#fff','font-weight':700});
+    jt.textContent='京';g.appendChild(jt);
+    const btxt=`${s.days}天`;
+    const bw=btxt.length*7+16;
+    g.appendChild(svgEl('rect',{x:-bw/2,y:-30,width:bw,height:16,rx:8,fill:'#DC2626',stroke:'#fff','stroke-width':1.6}));
+    const bt=svgEl('text',{y:-18,'text-anchor':'middle','font-size':10.5,fill:'#fff','font-weight':800});
+    bt.textContent=btxt;g.appendChild(bt);
+    const lb=svgEl('text',{y:32,'text-anchor':'middle',class:'mk-label'});
+    lb.textContent=s.name.replace('京东养车·','');g.appendChild(lb);
+    g.addEventListener('click',ev=>{ev.stopPropagation();openPop(s.id);});
+    layer.appendChild(g);
+  });
+}
+function popHTML(s){
+  return `
+   <div class="sp-head">
+     <span class="tag-solid">京东养车</span>
+     <span class="tag-light">${s.status}</span>
+     <div class="nm">${s.name}</div>
+     <button class="sp-close" onclick="closePop()" aria-label="关闭">×</button>
+   </div>
+   <div class="sp-card">
+     <div class="sp-photo"><span>京东</span><span>养车</span></div>
+     <div class="sp-info">
+       <div class="r"><span class="k">门店ID：</span><span class="num">${s.sid}</span></div>
+       <div class="r"><span class="k">开业时间：</span><span class="num">${s.open}</span></div>
+       <div class="r"><span class="k">预估合约到期日：</span><span class="num">${s.expiry}</span></div>
+       <div class="r"><span class="k">预估合同到期天数：</span><span class="days num">${s.days} 天</span></div>
+     </div>
+   </div>
+   <div class="sp-addr"><span class="pin">📍</span><span>${s.addr}</span></div>`;
+}
+function openPop(id){
+  const s=mapById(id);
+  if(!s||s.days<0)return;
+  state.selected=id;
+  const pop=document.getElementById('storePop');
+  document.getElementById('popInner').innerHTML=popHTML(s);
+  const wrap=document.getElementById('mapWrap');
+  const W=wrap.clientWidth,H=wrap.clientHeight||wrap.clientWidth*0.64;
+  let px=s.x/1000*W,py=s.y/640*H;
+  pop.classList.add('show');
+  const pw=pop.offsetWidth||312,ph=pop.offsetHeight||240;
+  let left=px-pw/2,below=false;
+  left=Math.max(8,Math.min(left,W-pw-8));
+  let top=py-ph-26;
+  if(top<8){top=py+26;below=true;}
+  pop.style.left=left+'px';pop.style.top=top+'px';
+  pop.classList.toggle('below',below);
+  const arrow=pop.querySelector('.sp-arrow');
+  arrow.style.left=Math.max(20,Math.min(px-left,pw-20))+'px';
+  renderMarkers();
+}
+function closePop(){
+  state.selected=null;
+  document.getElementById('storePop').classList.remove('show');
+  renderMarkers();
+}
+document.getElementById('mapSvg').addEventListener('click',closePop);
+function locateStore(id){
+  switchTab(2);
+  renderMarkers();
+  const src=byId(id)||mapById(id);
+  const target=mapById(id)||(src?MAP_STORES.find(m=>m.name===src.name):null);
+  requestAnimationFrame(()=>{
+    document.getElementById('mapWrap').scrollIntoView({behavior:'smooth',block:'center'});
+    if(target&&target.days>=0)setTimeout(()=>openPop(target.id),320);
+  });
+}
+
+/* ================= Tab3 中台（一句话 + 可展开明细） ================= */
+function renderMsg(){
+  const warn=JD.filter(s=>!isExpired(s));
+  const total=warn.length, hc=warn.filter(s=>s.hc).length;
+  document.getElementById('ppMsg').innerHTML=
+    `【翻店预警 · 周报】2026-07-27 周一 11:00<br>
+    上周（07-21 ～ 07-27）7 天累计京东门店预估合约到期需预警 <b class="hl">${total}</b> 家，其中高竞争城市 <b class="hl">${hc}</b> 家，明细已同步战区/BDM 预警群，<span class="msg-link" onclick="toggleMtDetail()" id="mtToggle">点击可查看明细</span>。<span class="msg-link" onclick="switchTab(2)">点击竞对地图进行查看</span>`;
+}
+function toggleMtDetail(){
+  const box=document.getElementById('mtDetailWrap');
+  const tog=document.getElementById('mtToggle');
+  const open=box.style.display==='none';
+  if(open){
+    const rows=JD.filter(s=>!isExpired(s)).sort((a,b)=>b.expiry.localeCompare(a.expiry));
+    document.getElementById('mtBody').innerHTML=rows.map(s=>rowHTML(s)).join('');
+    box.style.display='';
+    tog.textContent='收起明细';
+  }else{
+    box.style.display='none';
+    tog.textContent='点击可查看明细';
+  }
+}
+
+/* ================= 初始化 ================= */
+renderGrpTable();renderMarkers();renderMsg();
+window.addEventListener('resize',()=>{if(state.selected)openPop(state.selected);});
+</script>
+</body>
+</html>
