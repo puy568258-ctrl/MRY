@@ -137,6 +137,83 @@ main{max-width:1200px;margin:0 auto;padding:22px 20px 60px}
 .gb-sub b{color:var(--jd)}
 .grp-table-wrap{border:none;border-top:1px solid var(--line);border-radius:0;max-height:460px}
 .badge.exp2{background:#F3E8EE;color:#881337;border:1px solid #E7CDD9}
+/* ========== 竞对地图 · 左面板+工具栏布局 ========== */
+.cm-layout{display:flex;gap:14px;margin-top:12px;align-items:stretch}
+.cm-panel{width:340px;flex:none;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;max-height:660px}
+.cm-tabs{display:flex;border-bottom:1px solid var(--line);position:relative}
+.cm-tab{flex:1;padding:13px 0;font-size:14.5px;font-weight:600;color:var(--ink2);position:relative;transition:.15s}
+.cm-tab.active{color:var(--tuhu)}
+.cm-tab.active::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:40px;height:3px;border-radius:2px;background:var(--tuhu)}
+.cm-filters{padding:14px 14px 0}
+.cf-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cf-grid-2{grid-template-columns:1fr 1fr}
+.cf-span2{grid-column:1/3}
+.cf-inp{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:inherit;color:var(--ink);outline:none;background:#fff;width:100%}
+.cf-inp:focus{border-color:var(--tuhu)}
+select.cf-inp{color:var(--ink3);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px}
+.cf-search{margin:11px 0 0;width:100%;background:var(--tuhu);color:#fff;border-radius:8px;padding:9px 0;font-size:13.5px;font-weight:600;transition:.15s}
+.cf-search:hover{background:var(--tuhu-deep)}
+.cm-brand-tabs{display:flex;gap:0;margin-top:12px;border-bottom:1px solid var(--line)}
+.cm-brand{padding:9px 20px;font-size:13.5px;font-weight:600;color:var(--ink2);position:relative;transition:.15s}
+.cm-brand.active{color:var(--tuhu)}
+.cm-brand.active::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:2px;background:var(--tuhu)}
+/* 门店卡列表 */
+.cm-list{flex:1;overflow-y:auto;padding:12px 14px}
+.cm-card{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:11px;transition:.15s;cursor:pointer}
+.cm-card:hover{border-color:var(--tuhu);box-shadow:0 2px 10px rgba(255,102,0,.08)}
+.cm-card-top{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.cm-tag-jm{background:#FFF0E6;color:var(--tuhu);border-radius:4px;font-size:10.5px;font-weight:600;padding:1px 6px}
+.cm-tag-open{background:#E8F7EE;color:#15803D;border-radius:4px;font-size:10.5px;font-weight:600;padding:1px 6px}
+.cm-card-name{font-size:13.5px;font-weight:700;line-height:1.4;flex:1;min-width:100px}
+.cm-card-body{display:flex;gap:10px}
+.cm-photo{width:82px;height:82px;flex:none;border-radius:7px;overflow:hidden;background:linear-gradient(135deg,#E55A00,#CC3A00);position:relative}
+.cm-photo::after{content:"途虎养车";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.cm-photo.jd{background:linear-gradient(135deg,#E1251B,#A81810)}
+.cm-photo.jd::after{content:"京东养车"}
+.cm-photo.tmall{background:linear-gradient(135deg,#9333EA,#6B21A8)}
+.cm-photo.tmall::after{content:"天猫养车"}
+.cm-photo.xmz{background:linear-gradient(135deg,#2563EB,#1746A2)}
+.cm-photo.xmz::after{content:"小拇指"}
+.cm-info{flex:1;min-width:0;font-size:11.5px;color:var(--ink2);line-height:1.75}
+.cm-info .ci-row{display:flex;gap:4px}
+.cm-info .ci-k{color:var(--ink3);flex:none}
+.cm-info .ci-badges{position:absolute;right:11px;display:flex;flex-direction:column;gap:5px;align-items:center}
+.cm-mini-badge{width:24px;height:24px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.cm-mb-circle{color:var(--tuhu);border-color:var(--tuhu)}
+.cm-mb-high{color:#E1251B;border-color:#E1251B}
+.cm-addr{display:flex;gap:4px;font-size:11.5px;color:var(--ink2);margin-top:8px;line-height:1.5}
+.cm-addr .pin{flex:none;color:var(--ink3)}
+/* 竞对卡(简版) */
+.cm-card-comp .cc-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.cc-shop-ico{width:22px;height:22px;flex:none;color:#2563EB;font-size:16px}
+.cc-name{font-size:13.5px;font-weight:700;flex:1}
+.cc-rows{font-size:11.5px;color:var(--ink2);line-height:1.85}
+.cc-rows .ci-k{color:var(--ink3)}
+.cc-near{color:#1D4ED8}
+/* 分页 */
+.cm-pager{border-top:1px solid var(--line);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.cm-total{font-size:12.5px;color:var(--ink3)}
+.cm-page-ctrl{display:flex;align-items:center;gap:7px}
+.cm-pagesize{border:1px solid var(--line);border-radius:7px;padding:4px 8px;font-size:12px;font-family:inherit;color:var(--ink2);outline:none;background:#fff}
+.cm-pg{min-width:26px;height:26px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;color:var(--ink2);background:#fff;transition:.15s}
+.cm-pg:hover{border-color:var(--tuhu);color:var(--tuhu)}
+.cm-pg.active{background:var(--tuhu);border-color:var(--tuhu);color:#fff;font-weight:600}
+/* 地图区 */
+.cm-map{flex:1;min-width:0;position:relative}
+.cm-toolbar{position:absolute;top:12px;right:12px;z-index:15;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.cm-tb-row{display:flex;gap:8px}
+.cm-tb-btn,.cm-tb-btn2{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;color:var(--ink);font-weight:500;display:flex;align-items:center;gap:5px;box-shadow:0 1px 4px rgba(20,24,32,.08);transition:.15s;white-space:nowrap}
+.cm-tb-btn:hover,.cm-tb-btn2:hover{border-color:var(--tuhu);color:var(--tuhu)}
+.cm-tb-icon{padding:7px 10px}
+.tb-ico{font-size:13px;opacity:.7}
+.tb-caret{font-size:10px;opacity:.6}
+.cm-map .map-wrap{height:100%;border-radius:var(--radius)}
+.cm-map .map-svg{height:100%;object-fit:cover}
+@media (max-width:900px){
+  .cm-layout{flex-direction:column}
+  .cm-panel{width:100%;max-height:none}
+  .cm-toolbar{position:static;flex-direction:row;flex-wrap:wrap;margin-bottom:10px;align-items:flex-start}
+}
 /* ========== 竞对地图 ========== */
 .map-wrap{position:relative;background:#E9EDF1;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 .map-svg{display:block;width:100%;height:auto}
@@ -376,7 +453,74 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:v
 <!-- ================= Tab2 竞对地图 ================= -->
 <section class="tab-panel" id="tab2">
   <h2 class="sec-title">竞对地图 · 预估合约到期倒计时标识</h2>
-  <div class="map-wrap" id="mapWrap" style="margin-top:12px">
+  <div class="cm-layout">
+    <!-- 左侧面板 -->
+    <div class="cm-panel">
+      <div class="cm-tabs">
+        <button class="cm-tab active" data-t="tuhu" onclick="setCmTab('tuhu')">途虎门店</button>
+        <button class="cm-tab" data-t="comp" onclick="setCmTab('comp')">竞对门店</button>
+      </div>
+      <!-- 途虎门店筛选 -->
+      <div class="cm-filters" id="cmFiltersTuhu">
+        <div class="cf-grid">
+          <input class="cf-inp" type="text" placeholder="请输入门店名称">
+          <select class="cf-inp"><option>建店类型</option><option>工场店</option><option>纯洗美店</option><option>品牌店</option></select>
+          <input class="cf-inp" type="text" placeholder="请输入门店ID">
+          <select class="cf-inp"><option>是否高端店</option><option>是</option><option>否</option></select>
+          <input class="cf-inp" type="text" placeholder="门店开业日期" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
+          <select class="cf-inp"><option>营业状态</option><option>正常营业</option><option>暂停营业</option></select>
+          <select class="cf-inp"><option>门店上下架</option><option>已上架</option><option>已下架</option></select>
+          <select class="cf-inp"><option>请选择加盟商</option><option>耿川</option><option>蔡振岳</option><option>刘建国</option></select>
+        </div>
+        <button class="cf-search" onclick="renderCmList()">搜索</button>
+      </div>
+      <!-- 竞对门店筛选 -->
+      <div class="cm-filters" id="cmFiltersComp" style="display:none">
+        <div class="cf-grid cf-grid-2">
+          <input class="cf-inp" type="text" placeholder="门店名称">
+          <input class="cf-inp" type="text" placeholder="开业时间" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
+          <select class="cf-inp cf-span2"><option>营业状态</option><option>正常营业</option><option>暂停营业</option></select>
+        </div>
+        <button class="cf-search" onclick="renderCmList()">搜索</button>
+        <div class="cm-brand-tabs">
+          <button class="cm-brand active" data-b="jd" onclick="setCmBrand('jd')">狗</button>
+          <button class="cm-brand" data-b="tmall" onclick="setCmBrand('tmall')">猫</button>
+          <button class="cm-brand" data-b="xmz" onclick="setCmBrand('xmz')">XMZ</button>
+        </div>
+      </div>
+      <!-- 门店卡列表 -->
+      <div class="cm-list" id="cmList"></div>
+      <!-- 分页 -->
+      <div class="cm-pager">
+        <span class="cm-total" id="cmTotal">共 0 条</span>
+        <div class="cm-page-ctrl">
+          <select class="cm-pagesize"><option>20条/页</option><option>50条/页</option></select>
+          <button class="cm-pg">‹</button>
+          <button class="cm-pg active">1</button>
+          <button class="cm-pg">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 地图区 -->
+    <div class="cm-map">
+      <!-- 顶部工具栏 -->
+      <div class="cm-toolbar">
+        <div class="cm-tb-row">
+          <button class="cm-tb-btn"><span class="tb-ico">◱</span>显示名称</button>
+          <button class="cm-tb-btn"><span class="tb-ico">▤</span>图层</button>
+          <button class="cm-tb-btn cm-tb-city">武汉市 <span class="tb-caret">▾</span></button>
+          <button class="cm-tb-btn cm-tb-icon" title="全屏">⛶</button>
+        </div>
+        <div class="cm-tb-row">
+          <button class="cm-tb-btn2" onclick="cmStub()">城市店容查询</button>
+          <button class="cm-tb-btn2" onclick="cmStub()">店容查询</button>
+          <button class="cm-tb-btn2" onclick="cmStub()">点位预测</button>
+          <button class="cm-tb-btn2" onclick="cmStub()">区域数据</button>
+          <button class="cm-tb-btn2" onclick="cmStub()"><span class="tb-ico">✎</span>测距</button>
+        </div>
+      </div>
+      <div class="map-wrap" id="mapWrap">
     <svg class="map-svg" id="mapSvg" viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" aria-label="武汉市竞对地图示意">
       <rect width="1000" height="640" fill="#EDF1F5"/>
       <g fill="#E4E9EF">
@@ -427,10 +571,12 @@ footer{max-width:1200px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:v
       <g id="markerLayer"></g>
     </svg>
 
-    <div class="store-pop" id="storePop" role="dialog" aria-label="京东门店名片">
-      <div class="sp-arrow"></div>
-      <div id="popInner"></div>
+      <div class="store-pop" id="storePop" role="dialog" aria-label="京东门店名片">
+        <div class="sp-arrow"></div>
+        <div id="popInner"></div>
+      </div>
     </div>
+  </div>
   </div>
 </section>
 
@@ -530,7 +676,25 @@ const TUHU=[
 ];
 const XMZ=[{name:'小拇指·宝丰路店',x:330,y:246},{name:'小拇指·街道口店',x:690,y:436}];
 const TMALL=[{name:'天猫养车·常青路店',x:372,y:118},{name:'天猫养车·徐东店',x:648,y:252}];
-const state={selected:null};
+const TUHU_STORES=[
+ {name:"途虎养车工场店（古田中路店）",sid:"30965",area:"410",open:"2018-08-15",jm:"耿川",gw:"8(机修6/四轮1/精美0/纯洗1)",addr:"中华路989号",x:196,y:186,up:true,high:false},
+ {name:"途虎养车工场店（汉西建材店）",sid:"43378",area:"310",open:"2019-10-21",jm:"蔡振岳",gw:"6(机修4/四轮1/精美0/纯洗1)",addr:"汉西一路建材市场旁",x:150,y:214,up:true,high:false},
+ {name:"途虎养车工场店（后湖店）",sid:"11727",area:"410",open:"2016-01-05",jm:"上海宜拓汽车服务有限公司",gw:"8(机修6/四轮1/精美0/纯洗1)",addr:"后湖大道1245号1号楼",x:462,y:120,up:true,high:false},
+ {name:"途虎养车工场店（龙阳大道店）",sid:"12498",area:"590",open:"2016-06-01",jm:"刘建国",gw:"10(机修7/四轮2/精美0/纯洗1)",addr:"龙阳大道888号",x:238,y:428,up:true,high:true},
+ {name:"途虎养车工场店（南湖店）",sid:"28841",area:"360",open:"2020-03-18",jm:"周建华",gw:"7(机修5/四轮1/精美0/纯洗1)",addr:"南湖大道恒安路口",x:540,y:486,up:true,high:false},
+ {name:"途虎养车工场店（光谷大道店）",sid:"33012",area:"480",open:"2021-07-09",jm:"王志强",gw:"9(机修6/四轮2/精美0/纯洗1)",addr:"光谷大道金融港路",x:766,y:522,up:true,high:true},
+ {name:"途虎养车工场店（徐东店）",sid:"25519",area:"420",open:"2019-05-22",jm:"李红兵",gw:"8(机修6/四轮1/精美0/纯洗1)",addr:"徐东大街销品茂旁",x:648,y:270,up:true,high:false}
+];
+const TMALL_STORES=[
+ {name:"天猫养车·常青路店",type:"天猫",open:"2023-06-12",nearN:"途虎养车工场店（后湖店）",nearD:"420m",status:"正常营业",addr:"常青路常青花园",x:372,y:118},
+ {name:"天猫养车·徐东店",type:"天猫",open:"2022-11-08",nearN:"途虎养车工场店（徐东店）",nearD:"380m",status:"正常营业",addr:"徐东大街销品茂",x:648,y:252}
+];
+const XMZ_STORES=[
+ {name:"小拇指·宝丰路店",type:"小拇指",open:"2021-09-15",nearN:"途虎养车工场店（汉西建材店）",nearD:"560m",status:"正常营业",addr:"宝丰路中山大道口",x:330,y:246},
+ {name:"小拇指·街道口店",type:"小拇指",open:"2023-03-20",nearN:"途虎养车工场店（南湖店）",nearD:"690m",status:"正常营业",addr:"珞喻路街道口",x:690,y:436}
+];
+
+const state={selected:null,cmTab:'tuhu',cmBrand:'jd'};
 
 /* ================= 工具 ================= */
 const byId=id=>JD.find(x=>x.id===id);
@@ -678,6 +842,75 @@ function locateStore(id){
   });
 }
 
+/* ========== 竞对地图左面板 ========== */
+function setCmTab(t){
+  state.cmTab=t;
+  document.querySelectorAll('.cm-tab').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  document.getElementById('cmFiltersTuhu').style.display = t==='tuhu'?'':'none';
+  document.getElementById('cmFiltersComp').style.display = t==='comp'?'':'none';
+  renderCmList();
+}
+function setCmBrand(b){
+  state.cmBrand=b;
+  document.querySelectorAll('.cm-brand').forEach(x=>x.classList.toggle('active',x.dataset.b===b));
+  renderCmList();
+}
+function cmStub(){alert('该功能为生产系统能力，原型中暂未接入');}
+function renderCmList(){
+  const box=document.getElementById('cmList');
+  let html='',total=0;
+  if(state.cmTab==='tuhu'){
+    total=TUHU_STORES.length;
+    html=TUHU_STORES.map(s=>`
+      <div class="cm-card">
+        <div class="cm-card-top">
+          <span class="cm-tag-jm">加盟店</span>
+          <span class="cm-tag-open">正常营业</span>
+          <span class="cm-card-name">${s.name}</span>
+        </div>
+        <div class="cm-card-body" style="position:relative">
+          <div class="cm-photo"></div>
+          <div class="cm-info">
+            <div class="ci-row"><span class="ci-k">门店ID：</span><span class="num">${s.sid}</span></div>
+            <div class="ci-row"><span class="ci-k">面积：</span><span class="num">${s.area}m²</span></div>
+            <div class="ci-row"><span class="ci-k">开业时间：</span><span class="num">${s.open}</span></div>
+            <div class="ci-row"><span class="ci-k">上下架状态：</span><span>${s.up?'已上架':'已下架'}</span></div>
+            <div class="ci-row"><span class="ci-k">加盟商：</span><span>${s.jm}</span></div>
+            <div class="ci-row"><span class="ci-k">工位数：</span><span>${s.gw}</span></div>
+          </div>
+          <div class="ci-badges">
+            <span class="cm-mini-badge cm-mb-circle">圈</span>
+            ${s.high?'<span class="cm-mini-badge cm-mb-high">高</span>':''}
+          </div>
+        </div>
+        <div class="cm-addr"><span class="pin">📍</span><span>${s.addr}</span></div>
+      </div>`).join('');
+  }else{
+    let list,cls;
+    if(state.cmBrand==='jd'){list=JD.map(s=>({name:s.name,type:'京东',open:s.open,nearN:s.near[0].n,nearD:s.near[0].d,status:s.status,addr:s.addr}));cls='jd';}
+    else if(state.cmBrand==='tmall'){list=TMALL_STORES;cls='tmall';}
+    else{list=XMZ_STORES;cls='xmz';}
+    total=list.length;
+    html=list.map(s=>`
+      <div class="cm-card cm-card-comp">
+        <div class="cc-head">
+          <span class="cc-shop-ico">🏪</span>
+          <span class="cc-name">【${s.type}养车】${s.name.replace(/^(京东养车·|天猫养车·|小拇指·)/,'')}</span>
+        </div>
+        <div class="cc-rows">
+          <div><span class="ci-k">竞争门店类型：</span>${s.type}</div>
+          <div><span class="ci-k">营业状态：</span>${s.status}</div>
+          <div><span class="ci-k">开业时间：</span><span class="num">${s.open}</span></div>
+          <div><span class="ci-k">周边100米工场店：</span></div>
+          <div class="cc-near">${s.nearN}（${s.nearD} · ${s.status}）</div>
+        </div>
+        <div class="cm-addr"><span class="pin">📍</span><span>${s.addr}</span></div>
+      </div>`).join('');
+  }
+  box.innerHTML=html;
+  document.getElementById('cmTotal').textContent=`共 ${total} 条`;
+}
+
 /* ================= Tab3 中台（一句话 + 可展开明细） ================= */
 function renderMsg(){
   const warn=JD.filter(s=>!isExpired(s));
@@ -702,7 +935,7 @@ function toggleMtDetail(){
 }
 
 /* ================= 初始化 ================= */
-renderGrpTable();renderMarkers();renderMsg();
+renderGrpTable();renderMarkers();renderMsg();renderCmList();
 window.addEventListener('resize',()=>{if(state.selected)openPop(state.selected);});
 </script>
 </body>
